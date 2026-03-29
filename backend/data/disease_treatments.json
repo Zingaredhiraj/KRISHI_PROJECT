@@ -1,0 +1,230 @@
+{
+    "Apple___Apple_scab": {
+        "disease": "Apple Scab",
+        "crop": "Apple",
+        "treatment": "## Immediate Treatment\n1. **Myclobutanil (Rally)** — Apply 1 ml per liter of water every 10 days during wet weather\n2. **Captan 50% WP** — Apply 2 g per liter of water at 7–10 day intervals\n\n## Organic Treatment\n- **Sulfur fungicide** — Apply 3 g per liter every 7 days; avoid spraying in temperatures above 30°C\n- **Neem oil spray** — 5 ml per liter of water, spray every 10 days\n\n## Recommended Fertilizers\n3. **Balanced NPK (10:10:10)** — Apply 2 g per liter, once every 15 days to boost plant immunity\n4. **Calcium-based foliar spray** — Strengthens cell walls; apply post-flowering\n\n## Farmer Instructions\n- Remove and destroy fallen infected leaves immediately\n- Prune trees to improve air circulation\n- Spray fungicide before rain events during spring",
+        "prevention": "Use scab-resistant apple varieties. Practice good sanitation by removing fallen leaves. Ensure adequate spacing between trees for air circulation. Apply preventive fungicides during wet spring weather."
+    },
+    "Apple___Black_rot": {
+        "disease": "Black Rot",
+        "crop": "Apple",
+        "treatment": "## Immediate Treatment\n1. **Captan 50% WP** — Apply 2.5 g per liter of water every 7–10 days\n2. **Thiophanate-methyl** — Apply 1 g per liter as a follow-up spray\n\n## Organic Treatment\n- **Copper hydroxide spray** — 2 g per liter of water every 10 days\n- **Remove mummified fruits** from tree and ground immediately\n\n## Recommended Fertilizers\n3. **Potassium-rich fertilizer (0:0:50)** — Strengthens fruit quality; apply 3 g per liter monthly\n4. **Calcium ammonium nitrate** — Boosts overall tree vigor\n\n## Farmer Instructions\n- Prune out all dead and cankered wood during dormant season\n- Remove and destroy all mummified and infected fruits\n- Maintain proper tree spacing for airflow",
+        "prevention": "Remove all mummified fruits from tree and ground. Prune out dead wood and cankers. Apply dormant season fungicide. Ensure proper tree nutrition."
+    },
+    "Apple___Cedar_apple_rust": {
+        "disease": "Cedar Apple Rust",
+        "crop": "Apple",
+        "treatment": "## Immediate Treatment\n1. **Myclobutanil (Rally)** — Apply 1 ml per liter at first sign of orange spots, repeat every 10 days\n2. **Mancozeb 75% WP** — Apply 2.5 g per liter as protective spray\n\n## Organic Treatment\n- **Sulfur-based fungicide** — 3 g per liter every 7–10 days\n- **Remove nearby juniper/cedar trees** if possible (alternate host)\n\n## Recommended Fertilizers\n3. **Balanced NPK (20:20:20)** — Apply 2 g per liter during growing season\n4. **Zinc sulphate foliar spray** — 2 g per liter to strengthen leaf resistance\n\n## Farmer Instructions\n- Scout for galls on nearby cedar/juniper trees and remove them before spring\n- Apply fungicide before and during rainy periods\n- Choose rust-resistant apple varieties for new plantings",
+        "prevention": "Remove cedar and juniper trees near orchards. Plant resistant apple varieties. Apply preventive fungicides from pink bud stage through petal fall."
+    },
+    "Apple___healthy": {
+        "disease": "Healthy",
+        "crop": "Apple",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your apple plant appears healthy!\n\n## Maintenance Fertilizers\n2. **Balanced NPK (10:26:26)** — Apply during fruit setting for optimal yield\n3. **Organic compost** — Apply 5–10 kg per tree annually\n4. **Micronutrient spray (Zn + B)** — Apply foliar spray once a month during growth\n\n## Farmer Instructions\n- Continue regular irrigation and pest monitoring\n- Apply preventive fungicide sprays during humid weather\n- Prune dead wood and thin fruits for better quality",
+        "prevention": "Maintain good orchard hygiene. Regular pruning and nutrition program. Monitor for pests and diseases regularly."
+    },
+    "Blueberry___healthy": {
+        "disease": "Healthy",
+        "crop": "Blueberry",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your blueberry plant is healthy!\n\n## Maintenance Fertilizers\n2. **Ammonium sulfate** — Apply 30 g per plant in spring; blueberries prefer acidic soil\n3. **Acidic mulch (pine needles)** — Maintain soil pH between 4.5–5.5\n4. **Iron chelate spray** — Apply if leaves show yellowing between veins\n\n## Farmer Instructions\n- Keep soil consistently moist but not waterlogged\n- Mulch with pine bark or sawdust to maintain acidity\n- Prune old canes to encourage new fruit-bearing wood",
+        "prevention": "Maintain acidic soil pH. Water regularly. Mulch with organic acidic material. Prune annually for good air circulation."
+    },
+    "Cherry_(including_sour)___healthy": {
+        "disease": "Healthy",
+        "crop": "Cherry",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your cherry tree is healthy!\n\n## Maintenance Fertilizers\n2. **Balanced NPK (12:12:12)** — Apply 2 g per liter during active growth\n3. **Potassium sulfate** — Apply post-harvest to strengthen buds for next season\n4. **Calcium foliar spray** — Prevents fruit cracking\n\n## Farmer Instructions\n- Maintain regular watering during fruit development\n- Apply preventive copper spray during dormancy\n- Thin fruits to prevent branch overload",
+        "prevention": "Regular pruning for airflow. Balanced nutrition. Preventive fungicide sprays during wet weather."
+    },
+    "Cherry_(including_sour)___Powdery_mildew": {
+        "disease": "Powdery Mildew",
+        "crop": "Cherry",
+        "treatment": "## Immediate Treatment\n1. **Myclobutanil** — Apply 1 ml per liter every 10–14 days\n2. **Sulfur WP 80%** — Apply 3 g per liter as contact fungicide\n\n## Organic Treatment\n- **Potassium bicarbonate** — Mix 3 g per liter + few drops of liquid soap, spray weekly\n- **Neem oil** — 5 ml per liter of water, every 7 days\n\n## Recommended Fertilizers\n3. **Potassium-rich fertilizer (0:0:50)** — Strengthens plant cell walls against fungal penetration\n4. **Silicon-based foliar spray** — Creates physical barrier on leaf surface\n\n## Farmer Instructions\n- Remove heavily infected leaves and shoots\n- Improve air circulation by pruning\n- Water at base, avoid wetting foliage\n- Spray fungicide early in the morning",
+        "prevention": "Avoid overhead irrigation. Ensure good air circulation. Remove infected plant parts. Use resistant varieties when available."
+    },
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
+        "disease": "Cercospora Leaf Spot / Gray Leaf Spot",
+        "crop": "Corn (maize)",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2 g per liter of water every 7–10 days\n2. **Propiconazole (Tilt)** — Apply 1 ml per liter for severe infections\n\n## Organic Treatment\n- **Neem oil spray** — 3 ml per liter of water every 7 days\n- **Trichoderma viride** — Apply as soil drench (5 g per liter) to strengthen root defense\n\n## Recommended Fertilizers\n3. **Potash (Muriate of Potash)** — Apply 50 kg per acre to strengthen stalks and leaves\n4. **Zinc sulfate** — Foliar spray at 2 g per liter corrects deficiency and boosts immunity\n\n## Farmer Instructions\n- Practice crop rotation with non-host crops (legumes)\n- Avoid dense planting; maintain proper spacing\n- Destroy infected crop residues after harvest\n- Apply fungicide at first sign of gray rectangular lesions",
+        "prevention": "Use resistant corn varieties. Practice crop rotation. Avoid dense planting. Remove and destroy crop residues after harvest."
+    },
+    "Corn_(maize)___Common_rust_": {
+        "disease": "Common Rust",
+        "crop": "Corn (maize)",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2.5 g per liter of water at first sign of rust pustules, repeat every 7–10 days\n2. **Propiconazole 25% EC** — Apply 1 ml per liter for moderate to severe infection\n\n## Organic Treatment\n- **Neem oil spray** — 5 ml per liter of water, spray every 7 days to slow fungal spread\n- **Trichoderma harzianum** — Apply as soil treatment (5 g per liter) for systemic resistance\n\n## Recommended Fertilizers\n3. **Potassium chloride (MOP)** — 50 kg per acre strengthens cell walls and reduces rust severity\n4. **DAP (18:46:0)** — Apply at sowing for strong early growth and disease resistance\n\n## Farmer Instructions\n- Plant rust-resistant hybrid varieties (most effective measure)\n- Avoid late planting which increases rust exposure\n- Remove lower heavily infected leaves to reduce spore load\n- Apply fungicide within 48 hours of first pustule appearance for best results",
+        "prevention": "Plant resistant hybrid varieties. Avoid late planting. Ensure balanced fertilization. Monitor fields regularly during humid weather. Remove volunteer corn plants."
+    },
+    "Corn_(maize)___healthy": {
+        "disease": "Healthy",
+        "crop": "Corn (maize)",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your corn (maize) crop is healthy!\n\n## Maintenance Fertilizers\n2. **Urea (46% N)** — Top dress at 50 kg/acre at knee-high stage for vigorous growth\n3. **DAP (18:46:0)** — Apply at sowing for strong root establishment\n4. **Zinc sulfate** — Apply 10 kg/acre at sowing to prevent zinc deficiency\n\n## Farmer Instructions\n- Maintain proper irrigation during tasseling and silking stages\n- Scout regularly for early signs of pests and diseases\n- Apply preventive pest management during whorl stage",
+        "prevention": "Regular monitoring. Balanced nutrition. Proper irrigation. Crop rotation with legumes."
+    },
+    "Corn_(maize)___Northern_Leaf_Blight": {
+        "disease": "Northern Leaf Blight",
+        "crop": "Corn (maize)",
+        "treatment": "## Immediate Treatment\n1. **Propiconazole 25% EC (Tilt)** — Apply 1 ml per liter of water every 10–14 days\n2. **Azoxystrobin + Difenoconazole** — Apply 1 ml per liter for severe outbreaks\n\n## Organic Treatment\n- **Neem oil** — 5 ml per liter of water every 7 days as preventive\n- **Pseudomonas fluorescens** — Apply 10 g per liter as foliar spray for bio-control\n\n## Recommended Fertilizers\n3. **Potash (MOP 60%)** — Apply 40 kg/acre to strengthen plant defense\n4. **NPK 20:20:20** — Foliar spray at 5 g per liter during vegetative stage\n\n## Farmer Instructions\n- Plant NLB-resistant hybrids (Ht genes)\n- Implement minimum 2-year crop rotation\n- Destroy or deep-plow infected crop residues\n- Apply fungicide at V8–VT stage for best protection",
+        "prevention": "Use resistant hybrids. Crop rotation for minimum 2 years. Remove infected debris. Avoid overhead irrigation."
+    },
+    "Grape___Black_rot": {
+        "disease": "Black Rot",
+        "crop": "Grape",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2.5 g per liter before and during bloom\n2. **Myclobutanil** — Apply 1 ml per liter post-bloom every 10–14 days\n\n## Organic Treatment\n- **Copper hydroxide** — 2 g per liter before budburst\n- **Remove mummified berries** from vine and ground immediately\n\n## Recommended Fertilizers\n3. **Potassium sulfate (SOP)** — 100 g per vine during veraison for better berry quality\n4. **Calcium nitrate** — Foliar spray to strengthen cell walls\n\n## Farmer Instructions\n- Remove all mummified berries and infected canes during winter pruning\n- Apply fungicide from budburst through 4 weeks after bloom\n- Ensure good canopy management for air circulation",
+        "prevention": "Remove mummified berries. Prune for good air circulation. Apply preventive fungicides. Practice good canopy management."
+    },
+    "Grape___Esca_(Black_Measles)": {
+        "disease": "Esca (Black Measles)",
+        "crop": "Grape",
+        "treatment": "## Immediate Treatment\n1. **Thiophanate-methyl** — Apply as wound protectant after pruning\n2. **Sodium arsenite** (where legally permitted) — Apply during dormancy as trunk treatment\n\n## Organic Treatment\n- **Trichoderma-based bioagent** — Apply to pruning wounds immediately after cutting\n- **Avoid large pruning wounds** — Make smaller, cleaner cuts to reduce infection entry\n\n## Recommended Fertilizers\n3. **Potassium sulfate** — 100 g per vine to strengthen vascular system\n4. **Humic acid** — Apply 2 ml per liter as soil drench to boost root health\n\n## Farmer Instructions\n- Protect pruning wounds with fungicide paste immediately after cutting\n- Remove severely infected vines (trunk renewal may be needed)\n- Avoid pruning during wet weather\n- Maintain balanced vine nutrition to reduce stress",
+        "prevention": "Protect pruning wounds. Avoid large pruning cuts. Remove dead wood. Maintain balanced vine nutrition."
+    },
+    "Grape___healthy": {
+        "disease": "Healthy",
+        "crop": "Grape",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your grapevine is healthy!\n\n## Maintenance Fertilizers\n2. **NPK (12:12:12)** — Apply 50 g per vine during active growth\n3. **Potassium sulfate** — Apply 100 g per vine during veraison for sugar development\n4. **Micronutrient spray (Zn + Mn + Fe)** — Monthly foliar application\n\n## Farmer Instructions\n- Continue balanced canopy management\n- Monitor for signs of pests and disease regularly\n- Ensure proper irrigation during fruit development",
+        "prevention": "Regular monitoring. Good canopy management. Balanced nutrition. Preventive sprays during wet weather."
+    },
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
+        "disease": "Leaf Blight (Isariopsis Leaf Spot)",
+        "crop": "Grape",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2.5 g per liter of water every 7–10 days\n2. **Carbendazim 50% WP** — Apply 1 g per liter as systemic fungicide\n\n## Organic Treatment\n- **Bordeaux mixture (1%)** — Apply as preventive spray before monsoon\n- **Neem oil** — 5 ml per liter every 7 days\n\n## Recommended Fertilizers\n3. **Potassium-rich fertilizer (MOP)** — 50 g per vine to resist fungal infection\n4. **Calcium foliar spray** — Strengthens leaf cell walls\n\n## Farmer Instructions\n- Remove infected leaves immediately\n- Improve canopy aeration through proper training and pruning\n- Apply fungicide before and during monsoon season",
+        "prevention": "Good canopy management. Remove infected leaves. Apply preventive fungicides during wet weather. Proper vine training."
+    },
+    "Orange___Haunglongbing_(Citrus_greening)": {
+        "disease": "Huanglongbing (Citrus Greening)",
+        "crop": "Orange",
+        "treatment": "## Immediate Treatment\n1. **Imidacloprid 17.8% SL** — Apply 0.5 ml per liter to control Asian citrus psyllid (the disease vector)\n2. **Oxytetracycline antibiotic trunk injection** — Consult agricultural extension for application (where permitted)\n\n## Organic Treatment\n- **Neem oil spray** — 5 ml per liter to repel psyllid vectors\n- **Release Tamarixia radiata** — Natural parasitic wasp that controls psyllids\n\n## Recommended Fertilizers\n3. **Micronutrient cocktail (Zn + Mn + Fe + Mg)** — Foliar spray monthly to compensate for nutrient uptake deficiency\n4. **Enhanced NPK (15:15:15)** — Apply 100 g per tree monthly to maintain vigor\n\n## Farmer Instructions\n- **No cure exists** — Focus on vector (psyllid) control and nutritional support\n- Remove and destroy severely infected trees to prevent spread\n- Scout for psyllids regularly; they spread the bacteria\n- Maintain optimal tree nutrition to prolong productive life",
+        "prevention": "Control Asian citrus psyllid vector aggressively. Use disease-free nursery stock. Remove and destroy infected trees. Regular scouting."
+    },
+    "Peach___Bacterial_spot": {
+        "disease": "Bacterial Spot",
+        "crop": "Peach",
+        "treatment": "## Immediate Treatment\n1. **Copper hydroxide 77% WP** — Apply 2 g per liter at petal fall; repeat every 10–14 days\n2. **Oxytetracycline** — Apply as directed if copper alone is insufficient\n\n## Organic Treatment\n- **Copper-based organic spray** — Apply before bloom and after petal fall\n- **Prune for air circulation** — Open center training reduces leaf wetness\n\n## Recommended Fertilizers\n3. **Calcium nitrate** — Foliar spray to strengthen fruit skin and reduce cracking\n4. **Balanced NPK (10:10:10)** — 50 g per tree during growing season\n\n## Farmer Instructions\n- Choose resistant peach varieties for new plantings\n- Avoid overhead irrigation; use drip instead\n- Apply copper sprays preventively during wet weather\n- Remove severely infected branches",
+        "prevention": "Plant resistant varieties. Avoid overhead irrigation. Apply preventive copper sprays. Maintain good air circulation."
+    },
+    "Peach___healthy": {
+        "disease": "Healthy",
+        "crop": "Peach",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your peach tree is healthy!\n\n## Maintenance Fertilizers\n2. **Balanced NPK (10:10:10)** — Apply 50 g per tree during spring\n3. **Potassium sulfate** — Apply post-harvest to build reserves\n4. **Boron spray** — Foliar application during bloom for better fruit set\n\n## Farmer Instructions\n- Continue regular monitoring for pests and diseases\n- Apply dormant oil spray in winter\n- Thin fruits for better size and quality",
+        "prevention": "Regular pruning. Balanced nutrition. Dormant season sprays. Fruit thinning."
+    },
+    "Pepper,_bell___Bacterial_spot": {
+        "disease": "Bacterial Spot",
+        "crop": "Bell Pepper",
+        "treatment": "## Immediate Treatment\n1. **Copper oxychloride 50% WP** — Apply 2.5 g per liter every 7–10 days\n2. **Streptomycin sulfate** — 0.5 g per liter as supplementary spray (where permitted)\n\n## Organic Treatment\n- **Copper-based organic spray** — 2 g per liter weekly\n- **Bacillus subtilis** — Apply as biocontrol agent (5 g per liter)\n\n## Recommended Fertilizers\n3. **Calcium ammonium nitrate** — Prevents blossom end rot and strengthens tissue\n4. **NPK (19:19:19)** — 3 g per liter foliar spray every 15 days\n\n## Farmer Instructions\n- Use disease-free certified seeds or transplants\n- Avoid working in wet fields to prevent spread\n- Remove infected plants immediately\n- Practice 2–3 year crop rotation",
+        "prevention": "Use certified disease-free seeds. Crop rotation for 2–3 years. Avoid overhead irrigation. Remove infected plants promptly."
+    },
+    "Pepper,_bell___healthy": {
+        "disease": "Healthy",
+        "crop": "Bell Pepper",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your bell pepper plants are healthy!\n\n## Maintenance Fertilizers\n2. **NPK (19:19:19)** — Foliar spray at 3 g per liter every 15 days\n3. **Calcium nitrate** — Apply to prevent blossom end rot\n4. **Micronutrient spray (B + Zn)** — Monthly application for optimal fruit quality\n\n## Farmer Instructions\n- Maintain consistent watering to prevent stress\n- Apply mulch to conserve moisture and suppress weeds\n- Monitor for aphids and whiteflies regularly",
+        "prevention": "Consistent watering. Mulching. Regular pest monitoring. Balanced nutrition."
+    },
+    "Potato___Early_blight": {
+        "disease": "Early Blight",
+        "crop": "Potato",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2.5 g per liter every 7–10 days starting at first symptoms\n2. **Azoxystrobin 23% SC** — Apply 1 ml per liter for better systemic control\n\n## Organic Treatment\n- **Neem oil** — 5 ml per liter weekly spray\n- **Trichoderma viride** — Soil application at 5 g per liter before planting\n\n## Recommended Fertilizers\n3. **Potash (MOP)** — Apply 80 kg/acre for stronger tuber skin and disease resistance\n4. **NPK (12:32:16)** — Apply at planting for balanced nutrition\n\n## Farmer Instructions\n- Practice 2–3 year crop rotation with non-solanaceous crops\n- Remove and destroy infected plant debris\n- Avoid overhead irrigation; use furrow or drip\n- Harvest tubers when mature; avoid skin injuries during harvest",
+        "prevention": "Crop rotation with non-solanaceous crops. Remove infected debris. Avoid overhead irrigation. Use certified seed tubers."
+    },
+    "Potato___healthy": {
+        "disease": "Healthy",
+        "crop": "Potato",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your potato crop is healthy!\n\n## Maintenance Fertilizers\n2. **NPK (12:32:16)** — Apply at planting for balanced growth\n3. **Potash (MOP)** — Apply 80 kg/acre during earthing up for better tuber development\n4. **Boron + Zinc spray** — Foliar application for micronutrient supplementation\n\n## Farmer Instructions\n- Ensure timely earthing up to prevent tuber greening\n- Monitor for late blight during wet, cool weather\n- Maintain proper drainage to avoid waterlogging",
+        "prevention": "Regular monitoring. Timely earthing up. Proper drainage. Balanced nutrition."
+    },
+    "Potato___Late_blight": {
+        "disease": "Late Blight",
+        "crop": "Potato",
+        "treatment": "## Immediate Treatment\n1. **Metalaxyl + Mancozeb (Ridomil Gold)** — Apply 2.5 g per liter at first sign of disease; repeat every 7 days\n2. **Cymoxanil + Mancozeb (Curzate)** — Apply 3 g per liter as alternative systemic treatment\n\n## Organic Treatment\n- **Copper hydroxide** — 2 g per liter as preventive in early stages\n- **Bordeaux mixture (1%)** — Apply before expected rain\n\n## Recommended Fertilizers\n3. **Potassium sulfate (SOP)** — Apply 50 kg/acre to strengthen plant cell structure\n4. **Phosphorus-rich fertilizer** — Promotes strong root system for nutrient uptake\n\n## Farmer Instructions\n- **ACT FAST** — Late blight spreads rapidly in cool, wet conditions\n- Remove and destroy all infected plants immediately\n- Avoid irrigation during humid weather\n- Kill (desiccate) haulms 10–15 days before harvest\n- Store tubers in cool, dry, well-ventilated space",
+        "prevention": "Plant resistant varieties. Use certified seed tubers. Apply preventive fungicides before wet weather. Remove volunteer potato plants."
+    },
+    "Raspberry___healthy": {
+        "disease": "Healthy",
+        "crop": "Raspberry",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your raspberry plants are healthy!\n\n## Maintenance Fertilizers\n2. **NPK (10:10:10)** — Apply in spring at 50 g per plant\n3. **Potassium sulfate** — Apply post-harvest for strong cane growth\n4. **Iron chelate** — Foliar spray if yellowing appears\n\n## Farmer Instructions\n- Prune spent canes after fruiting\n- Maintain proper row spacing for air circulation\n- Mulch with organic material for moisture retention",
+        "prevention": "Annual pruning. Proper spacing. Mulching. Balanced nutrition."
+    },
+    "Soybean___healthy": {
+        "disease": "Healthy",
+        "crop": "Soybean",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your soybean crop is healthy!\n\n## Maintenance Fertilizers\n2. **DAP (18:46:0)** — Apply 50 kg/acre at sowing\n3. **Rhizobium culture** — Seed treatment for natural nitrogen fixation\n4. **Sulfur** — Apply 20 kg/acre for oil content improvement\n\n## Farmer Instructions\n- Monitor for pod borers during flowering\n- Ensure proper drainage during heavy rains\n- Scout for rust and other foliar diseases regularly",
+        "prevention": "Proper drainage. Seed treatment. Regular scouting. Crop rotation."
+    },
+    "Squash___Powdery_mildew": {
+        "disease": "Powdery Mildew",
+        "crop": "Squash",
+        "treatment": "## Immediate Treatment\n1. **Hexaconazole 5% EC** — Apply 2 ml per liter every 10–14 days\n2. **Sulfur WP 80%** — Apply 3 g per liter as contact fungicide\n\n## Organic Treatment\n- **Potassium bicarbonate** — 3 g per liter + liquid soap; spray weekly\n- **Milk spray (40% solution)** — Mix 400 ml milk in 600 ml water; spray twice weekly\n\n## Recommended Fertilizers\n3. **NPK (20:20:20)** — 3 g per liter every 15 days for balanced nutrition\n4. **Silicon foliar spray** — Creates physical barrier against fungal penetration\n\n## Farmer Instructions\n- Remove heavily infected leaves to reduce spore load\n- Water at base only, avoid wetting foliage\n- Plant resistant squash varieties\n- Ensure adequate spacing for air circulation",
+        "prevention": "Adequate plant spacing. Avoid overhead irrigation. Use resistant varieties. Remove infected leaves."
+    },
+    "Strawberry___healthy": {
+        "disease": "Healthy",
+        "crop": "Strawberry",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your strawberry plants are healthy!\n\n## Maintenance Fertilizers\n2. **NPK (12:12:12)** — Apply 2 g per liter every 15 days\n3. **Calcium nitrate** — Prevents tip burn and strengthens fruit\n4. **Potassium sulfate** — During fruiting for better sweetness and color\n\n## Farmer Instructions\n- Maintain mulch around plants for moisture and weed control\n- Remove runners to focus energy on fruiting\n- Monitor for spider mites and gray mold during humid weather",
+        "prevention": "Mulching. Runner management. Regular monitoring. Good air circulation."
+    },
+    "Strawberry___Leaf_scorch": {
+        "disease": "Leaf Scorch",
+        "crop": "Strawberry",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2.5 g per liter every 7–10 days\n2. **Carbendazim 50% WP** — Apply 1 g per liter as systemic fungicide\n\n## Organic Treatment\n- **Copper-based spray** — 2 g per liter every 10 days\n- **Remove infected leaves** — Clip and destroy immediately\n\n## Recommended Fertilizers\n3. **NPK (12:12:12)** — 2 g per liter to maintain plant vigor\n4. **Potassium-rich fertilizer** — Helps plant resist stress and disease\n\n## Farmer Instructions\n- Remove all scorched leaves to reduce source of infection\n- Renovate beds after harvest (mow, thin, fertilize)\n- Avoid overhead watering during afternoon/evening\n- Use resistant varieties for new plantings",
+        "prevention": "Remove infected leaves. Renovate beds annually. Avoid overhead irrigation. Use resistant varieties."
+    },
+    "Tomato___Bacterial_spot": {
+        "disease": "Bacterial Spot",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **Copper oxychloride 50% WP** — Apply 2.5 g per liter every 5–7 days\n2. **Streptomycin sulfate + Tetracycline** — Apply 0.5 g per liter (where permitted)\n\n## Organic Treatment\n- **Copper hydroxide organic spray** — 2 g per liter weekly\n- **Bacillus subtilis** — Apply 5 g per liter as biocontrol agent\n\n## Recommended Fertilizers\n3. **Calcium ammonium nitrate** — Strengthens cell walls; reduces disease entry points\n4. **NPK (19:19:19)** — 3 g per liter foliar spray every 15 days\n\n## Farmer Instructions\n- Use certified disease-free transplants\n- Avoid working in wet garden to prevent bacterial spread\n- Stake plants for better air circulation\n- Practice 3-year crop rotation with non-solanaceous crops",
+        "prevention": "Use disease-free seeds and transplants. Crop rotation. Avoid overhead irrigation. Stake plants for airflow."
+    },
+    "Tomato___Early_blight": {
+        "disease": "Early Blight",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2 g per liter of water every 7–10 days\n2. **Azoxystrobin 23% SC** — Apply 1 ml per liter for systemic protection\n\n## Organic Treatment\n- **Neem oil spray** — 3–5 ml per liter every 7 days; safe for beneficial insects\n- **Trichoderma viride** — Soil drench at 5 g per liter before transplanting\n\n## Recommended Fertilizers\n3. **Balanced NPK (19:19:19)** — 2 g per liter every 15 days to maintain plant vigor\n4. **Calcium foliar spray** — Strengthens leaf tissue against fungal penetration\n\n## Farmer Instructions\n- Remove and destroy lower infected leaves immediately\n- Apply mulch around base to prevent soil-splash infection\n- Maintain proper plant spacing for air circulation\n- Apply fungicide before rainy periods",
+        "prevention": "Practice crop rotation. Avoid overhead irrigation. Remove infected plant debris. Use disease-resistant varieties."
+    },
+    "Tomato___healthy": {
+        "disease": "Healthy",
+        "crop": "Tomato",
+        "treatment": "## Plant Health Status\n1. **No disease detected** — Your tomato plants are healthy!\n\n## Maintenance Fertilizers\n2. **NPK (19:19:19)** — Foliar spray at 3 g per liter every 15 days\n3. **Calcium nitrate** — Apply during fruiting to prevent blossom end rot\n4. **Micronutrient spray (B + Zn + Mn)** — Monthly application for balanced growth\n\n## Farmer Instructions\n- Continue regular staking and pruning of suckers\n- Maintain consistent watering to prevent cracking\n- Monitor for early signs of blight and pests\n- Apply preventive organic sprays during humid weather",
+        "prevention": "Consistent watering. Staking and pruning. Regular monitoring. Preventive organic sprays."
+    },
+    "Tomato___Late_blight": {
+        "disease": "Late Blight",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **Metalaxyl + Mancozeb (Ridomil Gold)** — Apply 2.5 g per liter immediately; repeat every 5–7 days\n2. **Cymoxanil + Mancozeb** — Apply 3 g per liter as alternative\n\n## Organic Treatment\n- **Copper hydroxide** — 2 g per liter as preventive spray\n- **Bordeaux mixture (1%)** — Apply before expected wet weather\n\n## Recommended Fertilizers\n3. **Potassium-rich fertilizer (MOP)** — Strengthens cell walls; 3 g per liter\n4. **Phosphorus booster** — Promotes root health for better nutrient absorption\n\n## Farmer Instructions\n- **ACT IMMEDIATELY** — Late blight can destroy entire crop within days\n- Remove and burn all infected plants and fruits\n- Avoid overhead irrigation\n- Stake plants and remove lower leaves for air circulation\n- Do not compost infected plant material",
+        "prevention": "Use resistant varieties. Apply preventive fungicides before wet weather. Remove infected material. Avoid overhead irrigation."
+    },
+    "Tomato___Leaf_Mold": {
+        "disease": "Leaf Mold",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2 g per liter every 7–10 days\n2. **Chlorothalonil** — Apply 2 g per liter as contact fungicide\n\n## Organic Treatment\n- **Neem oil** — 5 ml per liter weekly\n- **Improve ventilation** — Open greenhouse vents; reduce humidity below 85%\n\n## Recommended Fertilizers\n3. **NPK (19:19:19)** — 3 g per liter every 15 days\n4. **Potassium sulfate** — Strengthens plant against fungal attack\n\n## Farmer Instructions\n- Reduce humidity; improve greenhouse ventilation\n- Remove infected lower leaves immediately\n- Water at plant base; never wet the foliage\n- Space plants adequately for airflow",
+        "prevention": "Maintain low humidity (<85%). Good ventilation. Remove infected leaves. Use resistant varieties."
+    },
+    "Tomato___Septoria_leaf_spot": {
+        "disease": "Septoria Leaf Spot",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **Mancozeb 75% WP** — Apply 2.5 g per liter starting at first spots; repeat every 7 days\n2. **Chlorothalonil 75% WP** — Apply 2 g per liter as alternative\n\n## Organic Treatment\n- **Copper-based fungicide** — 2 g per liter weekly spray\n- **Neem oil** — 5 ml per liter of water every 7 days\n\n## Recommended Fertilizers\n3. **Balanced NPK (20:20:20)** — 3 g per liter every 15 days to maintain vigor\n4. **Potassium chloride** — Strengthens plant resistance to fungal diseases\n\n## Farmer Instructions\n- Remove and destroy infected lower leaves immediately\n- Apply mulch to prevent soil-splash infection\n- Stake plants and prune for good air circulation\n- Rotate crops for 2+ years; avoid planting solanaceous crops consecutively",
+        "prevention": "Remove infected leaves. Apply mulch. Good air circulation. Crop rotation for 2+ years."
+    },
+    "Tomato___Spider_mites Two-spotted_spider_mite": {
+        "disease": "Spider Mites (Two-spotted Spider Mite)",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **Abamectin 1.8% EC** — Apply 0.5 ml per liter; highly effective against mites\n2. **Spiromesifen 22.9% SC** — Apply 0.4 ml per liter for resistant mite populations\n\n## Organic Treatment\n- **Neem oil** — 5 ml per liter twice weekly; disrupts mite reproduction\n- **Strong water spray** — Blast undersides of leaves with water to dislodge mites\n- **Release predatory mites** (Phytoseiulus persimilis) for biological control\n\n## Recommended Fertilizers\n3. **NPK (19:19:19)** — 3 g per liter to maintain overall plant health\n4. **Silicon spray** — Creates physical barrier on leaf surface; deters mites\n\n## Farmer Instructions\n- Start treatment early; mites reproduce explosively in hot, dry weather\n- Check leaf undersides weekly with a hand lens\n- Increase humidity around plants (mites prefer dry conditions)\n- Remove heavily infested leaves\n- Do NOT use pyrethroid insecticides — they kill mite predators and worsen infestations",
+        "prevention": "Regular monitoring of leaf undersides. Maintain humidity. Avoid broad-spectrum insecticides. Use resistant varieties."
+    },
+    "Tomato___Target_Spot": {
+        "disease": "Target Spot",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **Azoxystrobin 23% SC** — Apply 1 ml per liter every 7–10 days\n2. **Mancozeb 75% WP** — Apply 2.5 g per liter as protective spray\n\n## Organic Treatment\n- **Neem oil** — 5 ml per liter weekly spray\n- **Copper hydroxide** — 2 g per liter as preventive\n\n## Recommended Fertilizers\n3. **NPK (19:19:19)** — 3 g per liter foliar spray every 15 days\n4. **Calcium + Boron spray** — Strengthens cell structure and reduces disease entry\n\n## Farmer Instructions\n- Remove and destroy affected lower leaves\n- Improve plant spacing for air circulation\n- Apply mulch to prevent soil-splash\n- Rotate crops for 2–3 years with non-solanaceous crops",
+        "prevention": "Good plant spacing. Mulching. Crop rotation. Remove infected leaves promptly."
+    },
+    "Tomato___Tomato_mosaic_virus": {
+        "disease": "Tomato Mosaic Virus",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **No chemical cure exists for viral infections** — Focus on vector control and containment\n2. **Imidacloprid 17.8% SL** — Apply 0.5 ml per liter to control aphid vectors\n\n## Organic Treatment\n- **Neem oil** — 5 ml per liter to repel aphids and other virus vectors\n- **Yellow sticky traps** — Install to monitor and trap aphid vectors\n\n## Recommended Fertilizers\n3. **NPK (19:19:19)** — 3 g per liter to maintain nutrition in infected plants\n4. **Micronutrient spray** — Monthly application to support immune response\n\n## Farmer Instructions\n- **Remove and destroy infected plants immediately** to prevent spread\n- Wash hands with soap and milk (20%) between handling plants\n- Disinfect all tools with 10% bleach solution\n- Use virus-free certified seeds\n- Do NOT save seeds from infected plants\n- Control aphids and whiteflies aggressively",
+        "prevention": "Use virus-free certified seeds. Disinfect tools. Control insect vectors. Remove infected plants immediately."
+    },
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
+        "disease": "Tomato Yellow Leaf Curl Virus (TYLCV)",
+        "crop": "Tomato",
+        "treatment": "## Immediate Treatment\n1. **No chemical cure for virus** — Focus entirely on whitefly vector control\n2. **Thiamethoxam 25% WG** — Apply 0.3 g per liter to control whitefly vectors\n3. **Cyantraniliprole 10% OD** — Apply 1.8 ml per liter for whitefly management\n\n## Organic Treatment\n- **Neem oil** — 5 ml per liter twice weekly to repel whiteflies\n- **Yellow sticky traps** — Install 15–20 per acre for monitoring and mass trapping\n- **Silver-colored mulch** — Reflects light and deters whiteflies from landing\n\n## Recommended Fertilizers\n3. **NPK (19:19:19)** — 3 g per liter to support plant health\n4. **Seaweed extract** — 2 ml per liter foliar spray to boost natural plant defense\n\n## Farmer Instructions\n- **Remove and destroy all infected plants immediately**\n- Use fine-mesh insect-proof net (50-mesh) in nurseries\n- Plant TYLCV-resistant tomato varieties (Ty genes)\n- Install reflective mulch to reduce whitefly landing\n- Avoid planting near old infected tomato fields",
+        "prevention": "Use resistant varieties with Ty genes. Install insect-proof nets. Control whiteflies. Remove infected plants. Reflective mulch."
+    }
+}

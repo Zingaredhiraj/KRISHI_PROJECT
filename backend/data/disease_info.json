@@ -1,0 +1,74 @@
+{
+  "Tomato_Early_Blight": {
+    "crop": "Tomato",
+    "disease": "Early Blight",
+    "cause": {
+      "en": "Fungal disease caused by Alternaria solani",
+      "mr": "Alternaria solani बुरशीमुळे होणारा रोग"
+    },
+    "symptoms": {
+      "en": [
+        "Dark brown spots with concentric rings on lower leaves",
+        "Yellow halos around leaf spots",
+        "Leaves dry and fall"
+      ],
+      "mr": [
+        "खालच्या पानांवर गडद तपकिरी वर्तुळाकार डाग",
+        "डागांच्या भोवती पिवळा कडा",
+        "पाने वाळून गळतात"
+      ]
+    },
+    "treatment": {
+      "organic": {
+        "en": [
+          {
+            "name": "Neem Oil Spray",
+            "dosage": "3–5 ml per liter",
+            "frequency": "Every 7 days",
+            "effectiveness": "Medium"
+          }
+        ],
+        "mr": [
+          {
+            "name": "नीम तेल फवारणी",
+            "dosage": "३–५ मि.ली. प्रति लिटर",
+            "frequency": "७ दिवसांनी",
+            "effectiveness": "मध्यम"
+          }
+        ]
+      },
+      "chemical": {
+        "en": [
+          {
+            "name": "Mancozeb",
+            "dosage": "2 g per liter",
+            "frequency": "7–10 days",
+            "effectiveness": "High"
+          }
+        ],
+        "mr": [
+          {
+            "name": "मॅन्कोझेब",
+            "dosage": "२ ग्रॅम प्रति लिटर",
+            "frequency": "७–१० दिवसांनी",
+            "effectiveness": "उच्च"
+          }
+        ]
+      }
+    },
+    "fertilizer": {
+      "en": [],
+      "mr": []
+    },
+    "prevention": {
+      "en": [
+        "Crop rotation",
+        "Remove infected debris"
+      ],
+      "mr": [
+        "पीक फेरपालट करा",
+        "संक्रमित अवशेष काढून टाका"
+      ]
+    }
+  }
+}

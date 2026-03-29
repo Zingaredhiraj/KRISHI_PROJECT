@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+krishi_digi/
+.venv/
+
+# Environment files — keep .env.example (safe templates), ignore real secrets
+.env
+.env.local
+.env.*.local
+# DO NOT ignore .env.example — it's a safe template
+
+# Build output
+.next/
+out/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads (large files — keep only the placeholder)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# ML model (too large for git — upload manually to Render)
+backend/model/*.keras
+backend/model/*.h5
+
+# Datasets (too large for git)
+backend/Datasets/
+
+# Logs
+*.log
+npm-debug.log*

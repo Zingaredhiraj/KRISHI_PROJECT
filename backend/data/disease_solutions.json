@@ -1,0 +1,176 @@
+{
+  "Tomato_Early_Blight": {
+    "crop": "Tomato",
+    "disease": "Early Blight",
+    "cause": {
+      "en": "Fungal disease caused by Alternaria solani",
+      "mr": "Alternaria solani बुरशीमुळे होणारा रोग"
+    },
+    "symptoms": {
+      "en": [
+        "Dark brown spots with concentric rings on lower leaves",
+        "Yellow halos around leaf spots",
+        "Leaves dry, curl, and fall"
+      ],
+      "mr": [
+        "खालच्या पानांवर गडद तपकिरी वर्तुळाकार डाग",
+        "डागांच्या भोवती पिवळा कडा",
+        "पाने वाळून गळतात"
+      ]
+    },
+    "treatment": {
+      "organic": {
+        "en": [
+          {
+            "name": "Neem Oil Spray",
+            "dosage": "3–5 ml per liter of water",
+            "frequency": "Every 7 days",
+            "effectiveness": "Medium",
+            "safety": "Safe for beneficial insects"
+          }
+        ],
+        "mr": [
+          {
+            "name": "नीम तेल फवारणी",
+            "dosage": "३–५ मि.ली. प्रति लिटर पाणी",
+            "frequency": "प्रत्येक ७ दिवसांनी",
+            "effectiveness": "मध्यम",
+            "safety": "उपयुक्त किडींना सुरक्षित"
+          }
+        ]
+      },
+      "chemical": {
+        "en": [
+          {
+            "name": "Mancozeb 75% WP",
+            "dosage": "2 g per liter of water",
+            "frequency": "Every 7–10 days",
+            "effectiveness": "High",
+            "safety": "Wear gloves and mask"
+          }
+        ],
+        "mr": [
+          {
+            "name": "मॅन्कोझेब",
+            "dosage": "२ ग्रॅम प्रति लिटर पाणी",
+            "frequency": "७–१० दिवसांनी",
+            "effectiveness": "उच्च",
+            "safety": "हातमोजे व मास्क वापरा"
+          }
+        ]
+      }
+    },
+    "fertilizer": {
+      "en": [
+        {
+          "name": "Balanced NPK (19:19:19)",
+          "dosage": "2 g per liter",
+          "frequency": "Once in 15 days",
+          "effectiveness": "Supportive",
+          "safety": "Do not overdose"
+        }
+      ],
+      "mr": [
+        {
+          "name": "समतोल NPK (१९:१९:१९)",
+          "dosage": "२ ग्रॅम प्रति लिटर",
+          "frequency": "१५ दिवसांतून एकदा",
+          "effectiveness": "पूरक",
+          "safety": "अतिवापर टाळा"
+        }
+      ]
+    },
+    "prevention": {
+      "en": [
+        "Practice crop rotation",
+        "Avoid overhead irrigation",
+        "Remove infected plant debris",
+        "Use disease-resistant varieties"
+      ],
+      "mr": [
+        "पीक फेरपालट करा",
+        "वरून पाणी देणे टाळा",
+        "संक्रमित अवशेष काढून टाका",
+        "प्रतिरोधक वाण वापरा"
+      ]
+    }
+  },
+
+  "Apple_Apple_Scab": {
+    "crop": "Apple",
+    "disease": "Apple Scab",
+    "cause": {
+      "en": "Fungal disease caused by Venturia inaequalis",
+      "mr": "Venturia inaequalis बुरशीमुळे होणारा रोग"
+    },
+    "treatment": {
+      "organic": {
+        "en": [
+          {
+            "name": "Sulfur Fungicide",
+            "dosage": "3 g per liter",
+            "frequency": "Every 7 days",
+            "effectiveness": "Medium",
+            "safety": "Avoid spraying in high heat"
+          }
+        ]
+      },
+      "chemical": {
+        "en": [
+          {
+            "name": "Myclobutanil",
+            "dosage": "1 ml per liter",
+            "frequency": "Every 10 days",
+            "effectiveness": "High",
+            "safety": "Use PPE"
+          }
+        ]
+      }
+    }
+  },
+
+  "Corn_Gray_Leaf_Spot": {
+    "crop": "Corn (Maize)",
+    "disease": "Cercospora Leaf Spot / Gray Leaf Spot",
+    "cause": {
+      "en": "Fungal disease caused by Cercospora zeae-maydis",
+      "mr": "Cercospora zeae-maydis बुरशीमुळे होणारा रोग"
+    },
+    "symptoms": {
+      "en": [
+        "Long rectangular gray lesions on leaves",
+        "Leaves dry prematurely",
+        "Reduced photosynthesis"
+      ]
+    },
+    "treatment": {
+      "organic": {
+        "en": [
+          {
+            "name": "Neem Oil Spray",
+            "dosage": "3 ml per liter",
+            "frequency": "Every 7 days",
+            "effectiveness": "Medium"
+          }
+        ]
+      },
+      "chemical": {
+        "en": [
+          {
+            "name": "Mancozeb",
+            "dosage": "2 g per liter",
+            "frequency": "7–10 days",
+            "effectiveness": "High"
+          }
+        ]
+      }
+    },
+    "prevention": {
+      "en": [
+        "Use resistant varieties",
+        "Crop rotation",
+        "Avoid dense planting"
+      ]
+    }
+  }
+}
