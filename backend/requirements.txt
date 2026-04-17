@@ -4,7 +4,7 @@ uvicorn[standard]==0.27.0
 
 # Database
 sqlalchemy==2.0.25
-pymysql==1.1.0
+psycopg2-binary==2.9.9
 cryptography==42.0.0
 alembic==1.13.1
 
@@ -15,8 +15,8 @@ python-multipart==0.0.6
 
 # AI / HTTP
 openai==1.10.0
-httpx==0.26.0
-google-genai>=1.0.0
+httpx==0.24.1
+google-genai==1.0.0
 
 # Image Processing (FIXED)
 pillow==9.5.0
@@ -26,6 +26,9 @@ pandas>=2.0.0
 openpyxl>=3.1.0
 xlrd>=2.0.0
 
+# Machine Learning (CPU only)
+tensorflow-cpu==2.16.1
+
 # Utilities
 python-dotenv==1.0.0
 pydantic==2.5.3
@@ -33,5 +36,17 @@ pydantic-settings==2.1.0
 email-validator==2.1.0
 python-dateutil==2.8.2
 
+# Scheduling
+APScheduler==3.10.4
+
+# Supabase
+supabase==2.3.0
+
 # Requests
 requests==2.31.0
+
+# RSS parsing
+feedparser==6.0.10
+
+# Scraping
+beautifulsoup4==4.12.3

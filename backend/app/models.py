@@ -49,7 +49,7 @@ class User(Base):
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
-    phone = Column(String(15), unique=True, index=True, nullable=False)
+    phone = Column(String(15), unique=True, index=True, nullable=True)
     name = Column(String(100), nullable=False)
     email = Column(String(100), nullable=True)
     location = Column(String(100), nullable=True)
@@ -103,12 +103,17 @@ class MarketPrice(Base):
     __tablename__ = "market_prices"
     
     id = Column(Integer, primary_key=True, index=True)
-    crop = Column(String(50), index=True, nullable=False)
-    price = Column(DECIMAL(10, 2), nullable=False)
-    unit = Column(String(20), nullable=False)
+    state = Column(String(50), index=True, nullable=False, default="Maharashtra")
+    district = Column(String(100), index=True, nullable=True)
+    taluka = Column(String(100), index=True, nullable=True)
     market = Column(String(100), index=True, nullable=False)
-    change_percent = Column(DECIMAL(5, 2))
-    recorded_at = Column(DateTime, default=datetime.utcnow)
+    crop = Column(String(50), index=True, nullable=False)
+    min_price = Column(DECIMAL(10, 2), nullable=True)
+    max_price = Column(DECIMAL(10, 2), nullable=True)
+    modal_price = Column(DECIMAL(10, 2), nullable=False)
+    unit = Column(String(20), nullable=False, default="Quintal")
+    date = Column(Date, nullable=False, default=lambda: datetime.now(timezone.utc).date())
+    recorded_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 class PriceHistory(Base):
     __tablename__ = "price_history"
@@ -352,7 +357,21 @@ class GovernmentScheme(Base):
     deadline = Column(Date, nullable=True)
     documents_required = Column(JSON, nullable=True)
     application_link = Column(String(255), nullable=True)
+    
+    # New Fields
+    category = Column(String(50), default="Central", index=True)  # State / Central
+    status = Column(String(50), default="Current", index=True)    # Current / Upcoming / Past
+    state_name = Column(String(100), nullable=True, index=True)
+    
+    # Eligibility Criteria
+    min_age = Column(Integer, nullable=True)
+    max_income = Column(DECIMAL(12, 2), nullable=True)
+    min_land_acres = Column(DECIMAL(10, 2), nullable=True)
+    eligible_categories = Column(String(255), nullable=True)     # "General, SC, ST, OBC"
+    
     is_active = Column(Boolean, default=True)
+    start_date = Column(Date, nullable=True)
+    end_date = Column(Date, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class UserDocument(Base):
@@ -408,3 +427,16 @@ class UserActivity(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     user = relationship("User", back_populates="activities")
+
+class NewsArticle(Base):
+    __tablename__ = "news_articles"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(500), nullable=False)
+    source = Column(String(200), nullable=False)
+    url = Column(String(500), nullable=False, unique=True)
+    image_url = Column(String(500), nullable=True)
+    content = Column(Text, nullable=True)
+    published_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+

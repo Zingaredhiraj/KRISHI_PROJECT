@@ -8,69 +8,91 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Sprout, ChevronRight, CheckCircle, Phone, ArrowLeft,
-  Shield, Scan, Bot, TrendingUp
+  Shield, Scan, Bot, TrendingUp, RefreshCw, Clock
 } from 'lucide-react';
 import { authApi } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [step, setStep] = useState<'email' | 'otp'>('email');
   const [loading, setLoading] = useState(false);
   const [demoOtp, setDemoOtp] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) router.replace('/dashboard');
   }, []);
 
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const timer = setTimeout(() => setResendTimer(t => t - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
+
   const handleSendOtp = async () => {
-    if (phone.length < 10) {
-      toast.error('Enter valid 10-digit phone number');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Enter a valid email address');
       return;
     }
     setLoading(true);
     try {
-      const response = await authApi.sendOTP(phone);
+      const response = await authApi.sendOTP(email);
+      
       if (response.data.otp) {
-        setDemoOtp(response.data.otp);
-        toast.success(`OTP sent! (Demo: ${response.data.otp})`);
+        toast.success(`OTP sent to your email address ✓`);
       } else {
-        toast.success('OTP sent successfully');
+        toast.success('OTP sent to your email address ✓');
       }
+      
       setStep('otp');
+      setResendTimer(60); // 60 second cooldown before resend
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to send OTP');
+      toast.error(error.response?.data?.detail || 'Failed to send OTP. Try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (otp.length < 4) {
-      toast.error('Enter valid OTP');
+    if (otp.length < 6) {
+      toast.error('Enter the OTP sent to your email');
       return;
     }
     setLoading(true);
     try {
-      const response = await authApi.verifyOTP(phone, otp);
-      const { access_token, user } = response.data;
+      const response = await authApi.verifyOTP(email, otp);
+      const { access_token, user, is_new_user } = response.data;
 
+      // Store auth data
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      // Check if user is new (default name = "Farmer User") → send to registration
-      if (user.name === 'Farmer User' || user.name === 'Farmer') {
-        toast.success('Welcome! Please complete your profile.');
+      // Route based on is_new_user flag from backend
+      if (is_new_user) {
+        toast.success('Welcome to Digital Krishi! Let\'s set up your profile.');
         setTimeout(() => router.replace('/register'), 300);
       } else {
-        toast.success(`Welcome back, ${user.name}!`);
+        toast.success(`Welcome back, ${user.name}! 🌾`);
         setTimeout(() => router.replace('/dashboard'), 300);
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Login failed');
+      const msg = error.response?.data?.detail;
+      if (msg?.includes('expired')) {
+        toast.error('OTP has expired. Please request a new one.');
+        setStep('email');
+        setOtp('');
+      } else if (msg?.includes('Invalid OTP')) {
+        toast.error('Wrong OTP. Please check and try again.');
+        setOtp('');
+      } else {
+        toast.error(msg || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -144,32 +166,27 @@ export default function LoginPage() {
             {/* Card header */}
             <div className="bg-gradient-to-r from-krishi-green to-emerald-500 px-8 py-6 text-white">
               <h2 className="text-2xl font-bold">
-                {step === 'phone' ? 'Welcome Back' : 'Verify Your Number'}
+                {step === 'email' ? 'Login / Register' : 'Verify OTP'}
               </h2>
               <p className="text-sm opacity-80 mt-1">
-                {step === 'phone'
-                  ? 'Enter your mobile number to continue'
-                  : `OTP sent to +91 ${phone}`}
+                {step === 'email'
+                  ? 'Enter your email address to continue'
+                  : `OTP sent to ${email}`}
               </p>
             </div>
 
             <CardContent className="p-8 space-y-6">
-              {step === 'phone' ? (
+              {step === 'email' ? (
                 <div className="space-y-5">
                   <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-2 block">Mobile Number</label>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 block">Email Address</label>
                     <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                        <span className="text-lg">🇮🇳</span>
-                        <span className="text-sm font-medium text-gray-500">+91</span>
-                        <div className="w-px h-5 bg-gray-300 ml-1" />
-                      </div>
                       <Input
-                        type="tel"
-                        placeholder="Enter 10-digit number"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                        className="h-14 text-lg pl-24 font-medium"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="h-14 text-lg font-medium"
                         onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()}
                       />
                     </div>
@@ -178,7 +195,7 @@ export default function LoginPage() {
                   <Button
                     type="button"
                     onClick={handleSendOtp}
-                    disabled={phone.length < 10 || loading}
+                    disabled={email.length < 5 || loading}
                     className="w-full h-14 bg-gradient-to-r from-krishi-green to-emerald-500 hover:from-krishi-dark hover:to-emerald-600 shadow-lg shadow-green-200 text-lg font-semibold gap-2"
                   >
                     {loading ? (
@@ -194,17 +211,16 @@ export default function LoginPage() {
                 </div>
               ) : (
                 <div className="space-y-5">
-                  {demoOtp && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center shrink-0">
-                        <Shield className="w-5 h-5 text-amber-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium text-amber-700">Demo Mode — OTP</p>
-                        <p className="text-2xl font-black text-amber-800 tracking-[0.3em]">{demoOtp}</p>
-                      </div>
+                  {/* Real Email notification */}
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-green-800">OTP sent via Email</p>
+                      <p className="text-xs text-green-600 mt-0.5">
+                        Check your inbox at {email}
+                      </p>
                     </div>
-                  )}
+                  </div>
 
                   <div>
                     <label className="text-sm font-semibold text-gray-700 mb-2 block">Enter OTP</label>
@@ -214,7 +230,21 @@ export default function LoginPage() {
                       onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       className="h-14 text-center text-2xl tracking-[0.5em] font-bold"
                       onKeyDown={(e) => e.key === 'Enter' && handleVerifyOtp()}
+                      autoFocus
                     />
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-xs text-gray-400 flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> OTP valid for 5 minutes
+                      </p>
+                      <button
+                        onClick={handleSendOtp}
+                        disabled={resendTimer > 0 || loading}
+                        className="text-xs text-krishi-green hover:text-krishi-dark font-semibold flex items-center gap-1 disabled:text-gray-400 disabled:cursor-not-allowed"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
+                      </button>
+                    </div>
                   </div>
 
                   <Button
@@ -231,10 +261,10 @@ export default function LoginPage() {
                   </Button>
 
                   <button
-                    onClick={() => { setStep('phone'); setDemoOtp(''); setOtp(''); }}
+                    onClick={() => { setStep('email'); setDemoOtp(''); setOtp(''); setResendTimer(0); }}
                     className="flex items-center justify-center gap-1 text-sm text-krishi-green hover:text-krishi-dark font-medium w-full"
                   >
-                    <ArrowLeft className="w-4 h-4" /> Change phone number
+                    <ArrowLeft className="w-4 h-4" /> Change email address
                   </button>
                 </div>
               )}

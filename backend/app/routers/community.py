@@ -539,6 +539,8 @@ def toggle_follow(
     existing = db.query(models.UserFollow).filter_by(
         follower_id=current_user.id, following_id=target_user_id).first()
 
+    from sqlalchemy.exc import IntegrityError
+
     if existing:
         db.delete(existing)
         following = False
@@ -546,7 +548,11 @@ def toggle_follow(
         db.add(models.UserFollow(follower_id=current_user.id, following_id=target_user_id))
         following = True
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        following = True # Was already concurrently added
 
     followers_count = db.query(models.UserFollow).filter_by(
         following_id=target_user_id).count()

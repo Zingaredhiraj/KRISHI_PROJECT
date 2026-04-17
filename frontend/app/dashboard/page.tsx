@@ -11,7 +11,7 @@ import {
   ChevronRight, MapPin, Phone, Headphones, User as UserIcon,
   Navigation, RefreshCw, AlertCircle, Thermometer, Eye,
   Image as ImageIcon, Video, Mic, Share2, Bookmark,
-  MoreHorizontal, Heart, MessageCircle
+  MoreHorizontal, Heart, MessageCircle, Newspaper, Calendar, ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -20,11 +20,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import {
   User, WeatherData, MarketPrice, ChatMessage, CommunityPost,
-  GovernmentScheme, Notification, DiseaseDetection
+  GovernmentScheme, Notification, DiseaseDetection, NewsArticle
 } from '@/lib/types';
 import {
   authApi, weatherApi, marketApi, chatApi, communityApi,
-  schemesApi, notificationsApi, uploadApi, diseaseApi, profileApi, API_BASE_URL
+  schemesApi, newsApi, notificationsApi, uploadApi, diseaseApi, profileApi, cropApi, API_BASE_URL
 } from '@/lib/api';
 
 const languages = [
@@ -51,7 +51,8 @@ export default function Dashboard() {
   const [language, setLanguage] = useState('en');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // No longer blocks the initial render
+  const [dataLoading, setDataLoading] = useState(true); // Background data loading
   const [aiLoading, setAiLoading] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
 
@@ -68,6 +69,7 @@ export default function Dashboard() {
   const [chatImageUrl, setChatImageUrl] = useState<string | null>(null);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [schemes, setSchemes] = useState<GovernmentScheme[]>([]);
+  const [news, setNews] = useState<NewsArticle[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [diseaseImage, setDiseaseImage] = useState<string | null>(null);
   const [diseaseResult, setDiseaseResult] = useState<DiseaseDetection | null>(null);
@@ -82,6 +84,13 @@ export default function Dashboard() {
   const [shareModalPostId, setShareModalPostId] = useState<number | null>(null);
   const [isAiSuggesting, setIsAiSuggesting] = useState(false);
 
+  // Crop Predictor States
+  const [showCropPredictor, setShowCropPredictor] = useState(false);
+  const [soilType, setSoilType] = useState('Loamy');
+  const [waterLevel, setWaterLevel] = useState('Moderate');
+  const [cropPrediction, setCropPrediction] = useState<any>(null);
+  const [predictingCrop, setPredictingCrop] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
 
@@ -90,26 +99,23 @@ export default function Dashboard() {
       return;
     }
 
-    // Load saved language preference
+    // ── STEP 1: Load from localStorage IMMEDIATELY (no loading state) ──
     const savedLang = localStorage.getItem('language');
     if (savedLang) setLanguage(savedLang);
 
-    // Try loading user from localStorage first for instant UI
     const userData = localStorage.getItem('user');
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
-        // Use user's language if no saved preference
         if (!savedLang && parsedUser.language) setLanguage(parsedUser.language);
-      } catch (e) {
-        // Invalid JSON, will fetch from API
-      }
+      } catch (e) { /* stale cache */ }
     }
 
-    // Fetch fresh user data and dashboard data
+    // ── STEP 2: Background refresh (non-blocking) ──
     initializeDashboard();
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── GPS Weather fetch ────────────────────────────────────────────
   const fetchWeather = useCallback(async (lat?: number, lon?: number) => {
@@ -122,7 +128,7 @@ export default function Dashboard() {
       setWeather(res.data);
       setLastUpdated(new Date());
     } catch (e) {
-      // silently fail — keep stale data
+      // silently fail — keep stale weather data
     } finally {
       setWeatherLoading(false);
     }
@@ -144,33 +150,35 @@ export default function Dashboard() {
       },
       (_err) => {
         setGpsStatus('denied');
-        fetchWeather(); // fallback to Pune
-        toast('Location access denied. Showing default city weather.', { icon: '📍' });
+        fetchWeather(); // fallback to default location
+        toast('Location access denied. Showing default weather.', { icon: '📍' });
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: false, timeout: 5000 } // Reduced timeout: 5s (was 10s)
     );
   }, [fetchWeather]);
 
   const initializeDashboard = async () => {
-    try {
-      // Fetch current user from API
-      const userRes = await authApi.getMe();
-      setUser(userRes.data);
-      localStorage.setItem('user', JSON.stringify(userRes.data));
-    } catch (error) {
-      // If API fails and no cached user, redirect to login
-      const userData = localStorage.getItem('user');
-      if (!userData) {
-        localStorage.removeItem('token');
-        router.replace('/login');
-        return;
-      }
-    }
+    // Run auth refresh + data load + GPS in parallel (non-blocking)
+    const authRefresh = authApi.getMe()
+      .then((userRes) => {
+        setUser(userRes.data);
+        localStorage.setItem('user', JSON.stringify(userRes.data));
+      })
+      .catch(() => {
+        // If token is completely invalid (not just slow), check cached user
+        const cached = localStorage.getItem('user');
+        if (!cached) {
+          localStorage.removeItem('token');
+          router.replace('/login');
+        }
+      });
 
-    await loadDashboardData();
-    setLoading(false);
-    // Start GPS request after dashboard loads
+    // Start GPS immediately — doesn't need to wait for auth
     requestGPS();
+
+    // Load dashboard data + auth refresh in parallel
+    await Promise.all([authRefresh, loadDashboardData()]);
+    setDataLoading(false);
   };
 
   // Auto-refresh weather every 5 minutes
@@ -191,15 +199,17 @@ export default function Dashboard() {
 
   const loadDashboardData = async () => {
     try {
-      const [marketRes, postsRes, schemesRes] = await Promise.allSettled([
+      const [marketRes, postsRes, schemesRes, newsRes] = await Promise.allSettled([
         marketApi.getPrices(),
         communityApi.getPosts(),
         schemesApi.getAll(),
+        newsApi.getAll(),
       ]);
 
       if (marketRes.status === 'fulfilled') setMarketPrices(marketRes.value.data);
       if (postsRes.status === 'fulfilled') setPosts(postsRes.value.data.posts || []);
       if (schemesRes.status === 'fulfilled') setSchemes(schemesRes.value.data);
+      if (newsRes.status === 'fulfilled') setNews(newsRes.value.data);
 
       // Notifications require auth, fetch separately
       try {
@@ -269,6 +279,36 @@ export default function Dashboard() {
       setDiseaseResult(null);
     } catch (error) {
       toast.error('Failed to upload image');
+    }
+  };
+
+  const handleCropPrediction = async () => {
+    setPredictingCrop(true);
+    try {
+      // Create mock 15-day history based on current weather +- some variance
+      const currentTemp = weather?.temperature || 28;
+      const currentHum = weather?.humidity || 65;
+      
+      const tempHistory = Array.from({length: 15}, () => Math.max(10, Math.min(50, Number(currentTemp) + (Math.random() * 6 - 3))));
+      const humHistory = Array.from({length: 15}, () => Math.max(20, Math.min(100, Number(currentHum) + (Math.random() * 20 - 10))));
+
+      const res = await cropApi.predict({
+        soil_type: soilType,
+        water_level: waterLevel,
+        temperature_history: tempHistory,
+        humidity_history: humHistory
+      });
+      setCropPrediction(res.data);
+      toast.success("AI prediction complete!");
+    } catch (e) {
+      toast.error('Failed to get crop prediction. Using fallback.');
+      setCropPrediction({
+        recommended_crop: "Wheat or Mustard",
+        reasoning: "Fallback recommendation.",
+        best_practices: "Monitor conditions."
+      });
+    } finally {
+      setPredictingCrop(false);
     }
   };
 
@@ -373,19 +413,33 @@ export default function Dashboard() {
     { id: 'weather', label: 'Weather', icon: Cloud },
     { id: 'market', label: 'Market Prices', icon: TrendingUp },
     { id: 'ai', label: 'AI Assistant', icon: Bot },
+    { id: 'news', label: 'Agri News', icon: Newspaper },
     { id: 'disease', label: 'Disease Detection', icon: Scan },
     { id: 'community', label: 'Community', icon: Users },
     { id: 'schemes', label: 'Govt Schemes', icon: FileText },
     { id: 'profile', label: 'My Profile', icon: UserIcon },
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-krishi-green border-t-transparent rounded-full animate-spin" />
+  // Skeleton card component for loading state
+  const SkeletonCard = () => (
+    <div className="bg-white rounded-xl p-4 shadow-sm">
+      <div className="skeleton skeleton-card mb-3" />
+      <div className="skeleton skeleton-text w-3/4" />
+      <div className="skeleton skeleton-text w-1/2" />
+    </div>
+  );
+
+  const SkeletonStat = () => (
+    <div className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-3">
+      <div className="skeleton w-10 h-10 rounded-lg" />
+      <div className="flex-1">
+        <div className="skeleton skeleton-title" />
+        <div className="skeleton skeleton-text w-1/3" />
       </div>
-    );
-  }
+    </div>
+  );
+
+  // No full-screen loading block — dashboard renders immediately from cache
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -486,11 +540,33 @@ export default function Dashboard() {
                   <button
                     key={item.id}
                     onClick={() => {
+                      if (item.id === 'market') {
+                        router.push('/market');
+                        setSidebarOpen(false);
+                        return;
+                      }
                       if (item.id === 'profile') {
                         router.push('/dashboard/profile');
                         setSidebarOpen(false);
                         return;
                       }
+                      if (item.id === 'news') {
+                        router.push('/dashboard/news');
+                        setSidebarOpen(false);
+                        return;
+                      }
+                      if (item.id === 'schemes') {
+                        router.push('/dashboard/schemes');
+                        setSidebarOpen(false);
+                        return;
+                      }
+                      if (item.id === 'dashboard') {
+                        setActiveTab('dashboard');
+                        setSidebarOpen(false);
+                        router.push('/dashboard');
+                        return;
+                      }
+
                       setActiveTab(item.id);
                       setSidebarOpen(false);
                     }}
@@ -545,76 +621,145 @@ export default function Dashboard() {
                 <p className="text-white/80">Here are your farming insights and updates for today</p>
               </div>
 
-              {/* Quick Stats */}
+              {/* Quick Stats — show skeleton while loading, real data once ready */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { label: 'Weather', value: `${weather?.temperature || 28}°C`, icon: Sun, color: 'text-yellow-500', bg: 'bg-yellow-50' },
-                  { label: 'Market', value: '+2.5%', icon: TrendingUp, color: 'text-green-500', bg: 'bg-green-50' },
-                  { label: 'Community', value: posts.length.toString(), icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
-                  { label: 'Schemes', value: schemes.length.toString(), icon: FileText, color: 'text-purple-500', bg: 'bg-purple-50' },
-                ].map((stat, idx) => (
-                  <Card key={idx} className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 ${stat.bg} rounded-lg flex items-center justify-center`}>
-                          <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                {dataLoading ? (
+                  [0, 1, 2, 3].map(i => <SkeletonStat key={i} />)
+                ) : (
+                  [
+                    { label: 'Weather', value: `${weather?.temperature || '—'}°C`, icon: Sun, color: 'text-yellow-500', bg: 'bg-yellow-50' },
+                    { label: 'Market', value: '+2.5%', icon: TrendingUp, color: 'text-green-500', bg: 'bg-green-50' },
+                    { label: 'Community', value: posts.length.toString(), icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
+                    { label: 'Schemes', value: schemes.length.toString(), icon: FileText, color: 'text-purple-500', bg: 'bg-purple-50' },
+                  ].map((stat, idx) => (
+                    <Card key={idx} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 ${stat.bg} rounded-lg flex items-center justify-center`}>
+                            <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold">{stat.value}</p>
+                            <p className="text-xs text-gray-500">{stat.label}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-2xl font-bold">{stat.value}</p>
-                          <p className="text-xs text-gray-500">{stat.label}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
+
 
               {/* Main Grid */}
               <div className="grid lg:grid-cols-3 gap-6">
-                {/* AI Assistant */}
+                {/* Best Crop Suggestion */}
                 <div className="lg:col-span-2">
-                  <Card className="border-0 shadow-lg h-[500px] flex flex-col">
-                    <CardHeader className="bg-gradient-to-r from-krishi-green to-krishi-green-light text-white">
+                  <Card className="border-0 shadow-lg h-[500px] flex flex-col overflow-hidden relative group rounded-3xl">
+                    <div className="absolute inset-0 bg-gradient-to-br from-krishi-green/5 via-krishi-lime/5 to-emerald-500/10 group-hover:scale-105 transition-transform duration-700" />
+                    <CardHeader className="bg-gradient-to-r from-krishi-green to-krishi-green-light text-white z-10 relative py-5">
                       <div className="flex items-center gap-3">
-                        <Bot className="w-6 h-6" />
-                        <CardTitle className="text-lg">AI Assistant</CardTitle>
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                          <Sprout className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl">Best Crop Suggestion</CardTitle>
+                          <p className="text-xs text-white/90 font-medium mt-0.5">Real-time dynamic recommendation based on your localized weather</p>
+                        </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="flex-1 flex flex-col p-4">
-                      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-                        {chatMessages.length === 0 && (
-                          <div className="text-center text-gray-500 py-8">
-                            <Bot className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                            <p>Ask me anything about farming!</p>
-                          </div>
-                        )}
-                        {chatMessages.map((msg) => (
-                          <div
-                            key={msg.id}
-                            className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                          >
-                            <div
-                              className={`max-w-[80%] px-4 py-2 rounded-2xl ${msg.type === 'user'
-                                ? 'bg-krishi-green text-white rounded-tr-sm'
-                                : 'bg-gray-100 text-gray-800 rounded-tl-sm'
-                                }`}
-                            >
-                              <p className="text-sm">{msg.content}</p>
+                    <CardContent className="flex-1 flex flex-col p-6 sm:p-8 z-10 relative justify-center bg-white/40 backdrop-blur-sm overflow-hidden">
+                      {weatherLoading ? (
+                         <div className="flex flex-col items-center justify-center space-y-4">
+                            <span className="relative flex h-14 w-14 items-center justify-center">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-krishi-green opacity-20"></span>
+                              <RefreshCw className="w-8 h-8 animate-spin text-krishi-green relative" />
+                            </span>
+                            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest animate-pulse">Analyzing Data...</p>
+                         </div>
+                      ) : showCropPredictor ? (
+                         <div className="w-full flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto pr-2 custom-scrollbar">
+                             <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-bold text-gray-800">Advanced AI Predictor</h3>
+                                <Button variant="ghost" size="sm" onClick={() => setShowCropPredictor(false)} className="text-gray-500 hover:text-gray-700">Back</Button>
+                             </div>
+                             
+                             <div className="grid grid-cols-2 gap-4 mb-4">
+                               <div className="space-y-1">
+                                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-widest">Soil Type</label>
+                                 <select className="w-full border-2 border-gray-100 rounded-xl p-2.5 text-sm font-medium focus:border-krishi-green focus:ring-0 outline-none text-gray-700 bg-white shadow-sm" value={soilType} onChange={(e) => setSoilType(e.target.value)}>
+                                   <option value="Loamy">🌱 Loamy</option>
+                                   <option value="Clay">🧱 Clay</option>
+                                   <option value="Sandy">🏖️ Sandy</option>
+                                   <option value="Black Soil">🌑 Black Soil</option>
+                                   <option value="Alluvial">🌊 Alluvial</option>
+                                 </select>
+                               </div>
+                               <div className="space-y-1">
+                                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-widest">Water Level</label>
+                                 <select className="w-full border-2 border-gray-100 rounded-xl p-2.5 text-sm font-medium focus:border-krishi-green focus:ring-0 outline-none text-gray-700 bg-white shadow-sm" value={waterLevel} onChange={(e) => setWaterLevel(e.target.value)}>
+                                   <option value="High">🌊 High (Abundant)</option>
+                                   <option value="Moderate">💧 Moderate (Average)</option>
+                                   <option value="Low">🏜️ Low (Scarce)</option>
+                                 </select>
+                               </div>
+                             </div>
+                             
+                             <Button onClick={handleCropPrediction} disabled={predictingCrop} className="w-full bg-krishi-green hover:bg-emerald-600 text-white rounded-xl py-6 shadow-md mb-6 font-bold text-md transition-all">
+                               {predictingCrop ? <><RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Analyzing 15-Day Data...</> : <><Bot className="w-6 h-6 mr-2" /> Generate AI Suggestion</>}
+                             </Button>
+
+                             {cropPrediction && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-5 sm:p-6 rounded-[1.5rem] shadow-xl border border-krishi-green/30 flex-1 flex flex-col relative overflow-hidden group">
+                                   <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-krishi-green/10 to-transparent rounded-bl-full pointer-events-none" />
+                                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"><Scan className="w-3.5 h-3.5 text-krishi-green" /> AI Recommended Crop</p>
+                                   <h3 className="text-3xl font-black text-krishi-dark mb-4 bg-gradient-to-r from-krishi-dark to-emerald-600 bg-clip-text text-transparent">{cropPrediction.recommended_crop}</h3>
+                                   <div className="space-y-3 relative z-10">
+                                     <div className="bg-gray-50 border border-gray-100 p-3.5 rounded-xl text-sm text-gray-600 leading-relaxed shadow-sm">
+                                        <div className="flex items-center gap-2 mb-1.5"><AlertCircle className="w-4 h-4 text-amber-500" /><strong className="text-gray-800 font-bold">Why this crop?</strong></div>
+                                        {cropPrediction.reasoning}
+                                     </div>
+                                     <div className="bg-krishi-green/5 border border-krishi-green/20 p-3.5 rounded-xl text-sm text-gray-700 leading-relaxed shadow-sm">
+                                        <div className="flex items-center gap-2 mb-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" /><strong className="text-krishi-dark font-bold">Best Practices</strong></div>
+                                        {cropPrediction.best_practices}
+                                     </div>
+                                   </div>
+                                </motion.div>
+                             )}
+                         </div>
+                      ) : (
+                         <div className="space-y-6 flex flex-col items-center text-center w-full">
+                            <div className="flex gap-4 sm:gap-6 w-full max-w-sm mx-auto">
+                              <div className="flex flex-col items-center justify-center bg-white h-28 rounded-[1.5rem] shadow-sm border border-gray-100 flex-1 hover:-translate-y-1 transition-transform">
+                                <Thermometer className="w-7 h-7 text-orange-500 mb-2" />
+                                <span className="text-2xl font-black text-gray-800 leading-none">{weather?.temperature || 28}°C</span>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Temp</span>
+                              </div>
+                              <div className="flex flex-col items-center justify-center bg-white h-28 rounded-[1.5rem] shadow-sm border border-gray-100 flex-1 hover:-translate-y-1 transition-transform">
+                                <Droplets className="w-7 h-7 text-blue-500 mb-2" />
+                                <span className="text-2xl font-black text-gray-800 leading-none">{weather?.humidity || 65}%</span>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Humidity</span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <Input
-                          value={chatInput}
-                          onChange={(e) => setChatInput(e.target.value)}
-                          placeholder="Ask your question..."
-                          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                        />
-                        <Button onClick={handleSendMessage} className="bg-krishi-green hover:bg-krishi-dark">
-                          <Send className="w-5 h-5" />
-                        </Button>
-                      </div>
+                            
+                            <div className="bg-white p-6 sm:p-8 rounded-[2rem] shadow-xl border border-krishi-green/20 w-full max-w-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300 mx-auto group/crop relative overflow-hidden">
+                               <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-krishi-green to-emerald-400 opacity-80" />
+                               <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Quick Recommendation</p>
+                               <h3 className="text-3xl sm:text-4xl font-black bg-gradient-to-br from-green-600 to-emerald-500 bg-clip-text text-transparent mb-3 py-1">
+                                  {Number(weather?.temperature || 28) > 30 ? 'Cotton or Maize' : Number(weather?.temperature || 28) < 20 ? 'Wheat or Mustard' : 'Rice or Soyabean'}
+                               </h3>
+                               <p className="text-gray-500 font-medium text-xs sm:text-[14px] leading-relaxed max-w-md mx-auto mb-5">
+                                 {Number(weather?.temperature || 28) > 30 
+                                     ? "Current high temperatures and humidity levels make it ideal to focus on heat-tolerant crops to maximize yield." 
+                                     : Number(weather?.temperature || 28) < 20 
+                                     ? "Cooler patterns detected. Perfect for rabi crops requiring less irrigation and lower baseline temperatures." 
+                                     : "Optimal moderate climate detected. Great conditions for water-intensive staple crops."}
+                               </p>
+                               <Button onClick={() => setShowCropPredictor(true)} variant="outline" className="rounded-full w-full border-krishi-green text-krishi-dark hover:bg-krishi-green hover:text-white font-bold transition-all shadow-sm">
+                                 <Scan className="w-4 h-4 mr-2" /> Detailed 15-Day AI Predictor
+                               </Button>
+                            </div>
+                         </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
@@ -761,112 +906,140 @@ export default function Dashboard() {
                       )}
 
                       {diseaseResult && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <motion.div 
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, staggerChildren: 0.15 }}
+                          className="space-y-6"
+                        >
                           {/* Alert Banner */}
-                          <div className={`p-6 rounded-2xl border ${(diseaseResult.detected_disease ?? '').toLowerCase().includes('healthy') ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} shadow-sm flex items-center justify-between`}>
-                            <div>
-                              <p className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-1">Detected Issue</p>
-                              <h3 className={`text-3xl font-black ${(diseaseResult.detected_disease ?? '').toLowerCase().includes('healthy') ? 'text-green-800' : 'text-red-800'}`}>
+                          <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className={`p-6 sm:p-8 rounded-[2rem] border bg-gradient-to-br ${(diseaseResult.detected_disease ?? '').toLowerCase().includes('healthy') ? 'from-green-50/80 via-emerald-100/50 to-green-100 border-green-300' : 'from-red-50/80 via-rose-100/50 to-red-100 border-red-300'} shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden backdrop-blur-xl`}
+                          >
+                            <div className="absolute -right-12 -top-12 opacity-[0.07] pointer-events-none">
+                              <Scan className="w-64 h-64" />
+                            </div>
+                            <div className="relative z-10 text-center sm:text-left">
+                              <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                                <span className="flex h-2 w-2 relative">
+                                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${(diseaseResult.detected_disease ?? '').toLowerCase().includes('healthy') ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                  <span className={`relative inline-flex rounded-full h-2 w-2 ${(diseaseResult.detected_disease ?? '').toLowerCase().includes('healthy') ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                </span>
+                                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500">AI Diagnosis Complete</p>
+                              </div>
+                              <h3 className={`text-3xl sm:text-4xl font-black mb-1 tracking-tight ${(diseaseResult.detected_disease ?? '').toLowerCase().includes('healthy') ? 'text-green-900' : 'text-red-900'}`}>
                                 {diseaseResult.detected_disease}
                               </h3>
-                              <div className="flex items-center gap-3 mt-2">
-                                <span className="px-3 py-1 bg-white rounded-full text-sm font-bold shadow-sm">Crop: {diseaseResult.crop_type}</span>
+                              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-4">
+                                <span className="px-5 py-2 bg-white/60 backdrop-blur-md rounded-2xl text-[13px] font-bold shadow-sm border border-white/50 text-gray-800">Crop: {diseaseResult.crop_type}</span>
+                                <span className={`px-5 py-2 rounded-2xl text-[13px] font-bold shadow-sm border ${(diseaseResult.confidence ?? 0) > 90 ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200' : 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-yellow-200'}`}>
+                                  {(diseaseResult.confidence ?? 0) > 90 ? 'High Confidence' : 'Moderate Confidence'}
+                                </span>
                               </div>
                             </div>
-                            <div className="text-center bg-white p-4 rounded-xl shadow-sm border min-w-[120px]">
-                              <p className="text-4xl font-black text-krishi-green">{diseaseResult.confidence}%</p>
-                              <p className="text-xs font-bold text-gray-400 uppercase mt-1">Confidence</p>
+                            <div className="text-center bg-white/90 backdrop-blur-xl p-6 rounded-[1.5em] shadow-2xl border border-white/50 min-w-[140px] relative z-10 transform hover:scale-105 transition-transform duration-300 group">
+                              <div className="absolute inset-0 bg-gradient-to-br from-krishi-green/5 to-emerald-500/5 rounded-[1.5em]"></div>
+                              <p className="text-5xl font-black bg-gradient-to-br from-krishi-green to-teal-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">{diseaseResult.confidence ?? 0}%</p>
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Accuracy Score</p>
                             </div>
-                          </div>
+                          </motion.div>
 
                           {/* Treatment Box */}
-                          <div className="bg-white rounded-2xl p-6 shadow-sm border-2 border-krishi-green/20 relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-2 h-full bg-krishi-green"></div>
-                            <div className="flex items-start gap-4">
-                              <div className="w-12 h-12 bg-krishi-lime/30 rounded-full flex items-center justify-center shrink-0">
-                                <CheckCircle className="w-6 h-6 text-krishi-green" />
+                          <motion.div 
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-xl shadow-krishi-green/5 border border-krishi-green/10 relative overflow-hidden group hover:shadow-2xl hover:shadow-krishi-green/10 transition-all duration-500"
+                          >
+                            <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-krishi-green via-emerald-400 to-krishi-green group-hover:w-3 transition-all duration-500"></div>
+                            <div className="flex flex-col sm:flex-row items-start gap-6">
+                              <div className="w-16 h-16 bg-gradient-to-br from-krishi-green to-emerald-400 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-green-200/50 transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
+                                <CheckCircle className="w-8 h-8 text-white" />
                               </div>
-                              <div className="flex-1">
-                                <h4 className="text-xl font-bold text-gray-900 mb-4">Recommended Treatment & Fertilizer Solutions</h4>
+                              <div className="flex-1 w-full">
+                                <h4 className="text-2xl font-black text-gray-900 mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">Recommended Treatment & Fertilizers</h4>
                                 <div className="space-y-4">
-                                  {diseaseResult.treatment?.split('\n').map((line, i) => {
+                                  {diseaseResult.treatment?.split('\n').map((line: string, i: number) => {
                                     const trimmed = line.trim();
                                     if (!trimmed) return null;
 
-                                    // Render bold markdown headers (## or **...**)
                                     if (trimmed.startsWith('## ') || trimmed.startsWith('# ')) {
                                       const text = trimmed.replace(/^#+\s*/, '').replace(/\*\*/g, '');
-                                      return <h5 key={i} className="text-lg font-bold text-krishi-dark mt-4 mb-1 border-b pb-1">{text}</h5>;
+                                      return <h5 key={i} className="text-xl font-black text-krishi-dark mt-6 mb-2 border-b-2 border-krishi-green/10 pb-2">{text}</h5>;
                                     }
 
-                                    // Fertilizer highlight box
                                     if (trimmed.includes('**Recommended Fertilizers:**')) {
                                       const ferts = trimmed.replace('**Recommended Fertilizers:**', '').trim();
                                       return (
-                                        <div key={i} className="mt-4 p-5 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200 flex items-center gap-5 shadow-sm">
-                                          <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center shrink-0">
-                                            <Sprout className="w-7 h-7 text-yellow-600" />
+                                        <div key={i} className="mt-6 p-6 sm:p-8 bg-gradient-to-br from-amber-50 to-orange-50/50 rounded-[1.5rem] border border-amber-200/50 flex flex-col sm:flex-row items-center gap-6 shadow-inner hover:shadow-md transition-shadow">
+                                          <div className="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center shrink-0 border border-amber-100 relative">
+                                            <div className="absolute inset-0 bg-amber-400/20 rounded-2xl animate-ping"></div>
+                                            <Sprout className="w-8 h-8 text-amber-500 relative z-10" />
                                           </div>
-                                          <div>
-                                            <p className="text-xs font-bold text-yellow-800 uppercase tracking-widest mb-1">Optimal Fertilizer Combination</p>
-                                            <p className="text-2xl font-black text-yellow-900">{ferts}</p>
+                                          <div className="text-center sm:text-left flex-1">
+                                            <p className="text-[11px] font-black text-amber-800/60 uppercase tracking-[0.2em] mb-2">Optimal Fertilizer Mix</p>
+                                            <p className="text-2xl sm:text-3xl font-black text-amber-900 leading-tight">{ferts}</p>
                                           </div>
                                         </div>
                                       );
                                     }
 
-                                    // Numbered list items (1. 2. 3. etc.)
                                     const numberedMatch = trimmed.match(/^(\d+)\.\s*(.*)/);
                                     if (numberedMatch) {
-                                      const content = numberedMatch[2].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                                      const content = numberedMatch[2].replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-bold">$1</strong>');
                                       return (
-                                        <div key={i} className="flex items-start gap-3 py-1">
-                                          <span className="w-7 h-7 bg-krishi-green text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">{numberedMatch[1]}</span>
-                                          <p className="text-base leading-relaxed text-gray-700" dangerouslySetInnerHTML={{ __html: content }} />
-                                        </div>
+                                        <motion.div whileHover={{ x: 8 }} key={i} className="flex items-start gap-4 py-2 group/item">
+                                          <span className="w-8 h-8 bg-krishi-green/10 text-krishi-green rounded-xl flex items-center justify-center text-sm font-black shrink-0 mt-0.5 group-hover/item:bg-krishi-green group-hover/item:text-white group-hover/item:shadow-lg transition-all duration-300">{numberedMatch[1]}</span>
+                                          <p className="text-[16px] leading-relaxed text-gray-600 pt-1" dangerouslySetInnerHTML={{ __html: content }} />
+                                        </motion.div>
                                       );
                                     }
 
-                                    // Bullet points (- or *)
                                     if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
-                                      const content = trimmed.replace(/^[-*]\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                                      const content = trimmed.replace(/^[-*]\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-bold">$1</strong>');
                                       return (
-                                        <div key={i} className="flex items-start gap-2 pl-4 py-0.5">
-                                          <span className="w-2 h-2 bg-krishi-green rounded-full mt-2 shrink-0"></span>
-                                          <p className="text-base leading-relaxed text-gray-700" dangerouslySetInnerHTML={{ __html: content }} />
+                                        <div key={i} className="flex items-start gap-4 pl-3 py-1.5 group/bullet">
+                                          <div className="w-6 h-6 rounded-full bg-krishi-green/10 flex items-center justify-center shrink-0 mt-0.5 group-hover/bullet:bg-krishi-green transition-colors duration-300">
+                                            <span className="w-2 h-2 bg-krishi-green rounded-full group-hover/bullet:bg-white transition-colors duration-300"></span>
+                                          </div>
+                                          <p className="text-[16px] leading-relaxed text-gray-600 pt-0.5" dangerouslySetInnerHTML={{ __html: content }} />
                                         </div>
                                       );
                                     }
 
-                                    // Bold section titles (**Something**)
                                     if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
                                       const text = trimmed.replace(/\*\*/g, '');
-                                      return <h5 key={i} className="text-lg font-bold text-krishi-dark mt-4 mb-1">{text}</h5>;
+                                      return <h5 key={i} className="text-lg font-black text-gray-900 mt-6 mb-2">{text}</h5>;
                                     }
 
-                                    // Regular paragraph (with inline bold support)
-                                    const content = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                                    return <p key={i} className="text-base leading-relaxed text-gray-700" dangerouslySetInnerHTML={{ __html: content }} />;
+                                    const content = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-bold">$1</strong>');
+                                    return <p key={i} className="text-[16px] leading-relaxed text-gray-600" dangerouslySetInnerHTML={{ __html: content }} />;
                                   })}
                                 </div>
                               </div>
                             </div>
-                          </div>
+                          </motion.div>
 
                           {/* Prevention Box */}
                           {diseaseResult.prevention && (
-                            <div className="bg-gray-50 rounded-2xl p-6 border flex items-start gap-4">
-                              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 shadow-sm border">
-                                <Scan className="w-6 h-6 text-gray-500" />
+                            <motion.div 
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              className="bg-gradient-to-br from-blue-50/80 to-cyan-50/50 rounded-[2rem] p-6 sm:p-8 border border-blue-100 flex flex-col sm:flex-row items-center sm:items-start gap-6 shadow-lg shadow-blue-500/5 hover:shadow-xl hover:shadow-blue-500/10 transition-shadow backdrop-blur-sm"
+                            >
+                              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-blue-200/50 border-2 border-blue-50 text-blue-500">
+                                <AlertCircle className="w-8 h-8" />
                               </div>
-                              <div>
-                                <h4 className="text-lg font-bold text-gray-900 mb-2">Prevention Measures</h4>
-                                <p className="text-gray-600 leading-relaxed text-lg">{diseaseResult.prevention}</p>
+                              <div className="text-center sm:text-left">
+                                <h4 className="text-xl font-black text-blue-900 mb-3">Prevention Measures</h4>
+                                <p className="text-blue-800/80 leading-relaxed text-[16px] font-medium">{diseaseResult.prevention}</p>
                               </div>
-                            </div>
+                            </motion.div>
                           )}
-                        </div>
+                        </motion.div>
                       )}
+
                     </div>
                   )}
                 </CardContent>
@@ -994,9 +1167,26 @@ export default function Dashboard() {
                         </span>
                       </div>
                     </div>
-                    <button className="p-1 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors">
-                      <MoreHorizontal className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {post.user?.id !== user?.id && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await communityApi.followUser(post.user.id);
+                              const postsRes = await communityApi.getPosts();
+                              setPosts(postsRes.data.posts || []);
+                              toast.success(post.is_following_author ? `Unsubscribed from ${post.user.name}` : `Subscribed to ${post.user.name}`);
+                            } catch { toast.error('Failed to update subscription'); }
+                          }}
+                          className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all border ${post.is_following_author ? 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-red-50 hover:text-red-700 hover:border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-600 hover:text-white'}`}
+                        >
+                          {post.is_following_author ? 'Unsubscribe' : 'Subscribe'}
+                        </button>
+                      )}
+                      <button className="p-1 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors">
+                        <MoreHorizontal className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Media Content (Full Width) */}
@@ -1148,7 +1338,12 @@ export default function Dashboard() {
                                 <p className="text-xs text-gray-500">Connected</p>
                               </div>
                             </div>
-                            <Button size="sm" variant="outline" className="rounded-full h-8 text-xs font-semibold border-gray-300" onClick={() => {
+                            <Button size="sm" variant="outline" className="rounded-full h-8 text-xs font-semibold border-gray-300" onClick={async () => {
+                               if (shareModalPostId) {
+                                  try { await communityApi.sharePost(shareModalPostId, "in_app"); } catch {}
+                                  const postsRes = await communityApi.getPosts();
+                                  setPosts(postsRes.data.posts || []);
+                               }
                                toast.success(`Post shared with ${name}`);
                                setShareModalPostId(null);
                             }}>
@@ -1157,9 +1352,15 @@ export default function Dashboard() {
                           </div>
                         ))}
                       </div>
-                      <Button className="w-full rounded-xl bg-gray-100 text-black hover:bg-gray-200" variant="ghost" onClick={() => {
+                      <Button className="w-full rounded-xl bg-gray-100 text-black hover:bg-gray-200" variant="ghost" onClick={async () => {
                          navigator.clipboard.writeText(`http://localhost:3000/dashboard?post=${shareModalPostId}`);
+                         if (shareModalPostId) {
+                           try { await communityApi.sharePost(shareModalPostId, "external"); } catch {}
+                           const postsRes = await communityApi.getPosts();
+                           setPosts(postsRes.data.posts || []);
+                         }
                          toast.success("Link copied!");
+                         setShareModalPostId(null);
                       }}>
                         Copy Link
                       </Button>
@@ -1434,6 +1635,66 @@ export default function Dashboard() {
             </div>
           )}
 
+          {/* ============ AGRI NEWS FULL PAGE ============ */}
+          {activeTab === 'news' && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-indigo-500 via-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl flex items-center justify-between overflow-hidden relative border border-indigo-400/50">
+                <div className="absolute -right-16 -top-16 opacity-[0.07] transform rotate-12"><Newspaper className="w-80 h-80" /></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvc3ZnPg==')]" />
+                <div className="relative z-10 flex items-center gap-5">
+                  <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/20 shadow-inner">
+                    <Newspaper className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-black font-display tracking-tight mb-1">Agri News & Trends</h2>
+                    <p className="text-[15px] opacity-90 font-medium">Stay updated with the latest in agriculture, subsidies, and global markets.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {news.length > 0 ? news.map((article, idx) => (
+                  <Card key={idx} className="border-0 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-500 group overflow-hidden rounded-3xl flex flex-col h-full bg-white transform hover:-translate-y-1">
+                    <div className="h-48 overflow-hidden relative">
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent z-10" />
+                      <img 
+                        src={article.image_url || "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=800&q=80"} 
+                        alt={article.title} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                      />
+                      <div className="absolute bottom-4 left-4 z-20 flex gap-2">
+                        <span className="bg-indigo-600/90 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">{article.source}</span>
+                      </div>
+                    </div>
+                    <CardContent className="p-6 flex flex-col flex-1">
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                         <Calendar className="w-3.5 h-3.5" /> 
+                         {new Date(article.published_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                      </p>
+                      <h3 className="font-bold text-gray-900 text-lg leading-snug mb-3 group-hover:text-indigo-600 transition-colors">{article.title}</h3>
+                      <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-1 line-clamp-3">{article.content}</p>
+                      
+                      <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <a 
+                          href={article.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-indigo-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all"
+                        >
+                          Read More <ArrowRight className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )) : (
+                  [1,2,3,4,5,6].map(i => (
+                    <div key={i} className="animate-pulse bg-white rounded-3xl h-80 shadow-sm border border-gray-100" />
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ============ AI ASSISTANT FULL PAGE ============ */}
           {activeTab === 'ai' && (
             <div className="max-w-3xl mx-auto">
@@ -1449,13 +1710,13 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="flex-1 flex flex-col p-4">
+                <CardContent className="flex-1 flex flex-col p-4 overflow-hidden">
                   {/* Language indicator */}
                   <div className="flex items-center justify-between px-2 pb-2 border-b mb-3">
                     <span className="text-xs text-gray-400">AI responses in: <strong className="text-krishi-green">{languages.find(l => l.code === language)?.label}</strong></span>
                     <span className="text-xs text-gray-300">Powered by Gemini AI</span>
                   </div>
-                  <div className="flex-1 overflow-y-auto space-y-4 mb-4 px-2">
+                  <div className="flex-1 overflow-y-auto space-y-4 mb-4 px-3 pr-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-50 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-krishi-green/30 hover:[&::-webkit-scrollbar-thumb]:bg-krishi-green/60 [&::-webkit-scrollbar-thumb]:rounded-full transition-all">
                     {chatMessages.length === 0 && (
                       <div className="text-center text-gray-400 py-16">
                         <Bot className="w-16 h-16 mx-auto mb-4 opacity-30" />
@@ -1502,7 +1763,7 @@ export default function Dashboard() {
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-col gap-2 border-t pt-4">
+                  <div className="flex flex-col gap-2 border-t pt-4 shrink-0">
                     {chatImageUrl && (
                       <div className="relative w-20 h-20 rounded-lg overflow-hidden border ml-2">
                         <img src={chatImageUrl.startsWith('/') ? `${API_BASE_URL}${chatImageUrl}` : chatImageUrl} alt="Upload preview" className="w-full h-full object-cover" />

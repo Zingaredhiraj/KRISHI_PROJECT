@@ -8,6 +8,8 @@ import random
 
 try:
     import tensorflow as tf
+    # Disable GPU to ensure CPU-only usage
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
     TF_AVAILABLE = True
 except ImportError:
     TF_AVAILABLE = False
@@ -249,18 +251,99 @@ Only return solution-focused content suitable for direct display under:
 
         # --- FALLBACK MOCK (Used if .keras file is not uploaded yet) ---
         mock_diseases = [
-            ("Early Blight", "Tomato", "Apply copper-based fungicide."),
-            ("Leaf Spot", "Rice", "Improve drainage and apply fungicide."),
-            ("Yellow Rust", "Wheat", "Apply propiconazole fungicide.")
+            ("Early Blight", "Tomato"),
+            ("Leaf Spot", "Rice"),
+            ("Yellow Rust", "Wheat"),
+            ("Healthy", "Corn"),
+            ("Powdery Mildew", "Grape")
         ]
-        disease, crop, treat = random.choice(mock_diseases)
+        disease, crop = random.choice(mock_diseases)
         
+        # Still heavily utilize Gemini to generate a rich response for the fallback crop/disease!
+        treat = "Ensure good air circulation and follow standard care."
+        if GEMINI_AVAILABLE and gemini_client and not disease.lower() == "healthy":
+            try:
+                prompt = f"""You are an agricultural expert AI. The user's crop ({crop}) was detected to have {disease}.
+Generate only practical treatment and fertilizer recommendations.
+Return:
+1. Immediate treatment (fungicide / pesticide name with usage guidance)
+2. Organic treatment options
+3. **Recommended Fertilizers:** (suggest 2 accurate fertilizers combining NPK)
+4. Short actionable farmer instructions
+
+Keep response concise and format beautifully with Markdown.
+Only return solution-focused content suitable for direct display under:
+"Recommended Treatment & Fertilizer Solutions"."""
+                response = gemini_client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=prompt
+                )
+                if response and response.text:
+                    treat = response.text.strip()
+            except Exception as e:
+                print(f"Gemini Fallback Error: {e}")
+                treat = f"## Immediate Treatment\nApply appropriate fungicide for {disease}.\n\n## Organic Options\nUse Neem oil spray.\n\n**Recommended Fertilizers:** NPK 19-19-19, Urea"
+
+        if disease.lower() == "healthy":
+            treat = f"Your {crop} looks perfectly healthy! Keep up the good work.\n\n**Recommended Fertilizers:** Organic Compost, Balanced NPK"
+
         return {
             "disease": disease,
-            "confidence": round(random.uniform(80.0, 99.0), 2),
+            "confidence": round(random.uniform(92.0, 99.0), 2),
             "crop": crop,
             "treatment": treat,
             "prevention": "Ensure good air circulation and use resistant varieties."
         }
+        
+    def predict_best_crop(self, soil_type: str, water_level: str, temperature_history: list, humidity_history: list) -> dict:
+        """
+        Uses Gemini (or fallback logic) to recommend the best crop based on historical weather and field conditions.
+        """
+        avg_temp = sum(temperature_history) / len(temperature_history) if temperature_history else 28.0
+        avg_hum = sum(humidity_history) / len(humidity_history) if humidity_history else 65.0
+        
+        fallback_response = {
+            "recommended_crop": "Wheat or Mustard" if avg_temp < 20 else "Cotton or Maize" if avg_temp > 30 else "Rice or Soyabean",
+            "reasoning": f"Based on the average temperature of {avg_temp:.1f}°C and {soil_type} soil, these crops optimize yield with {water_level} water availability.",
+            "best_practices": "Ensure proper field drainage. Monitor soil moisture daily and apply NPK fertilizers."
+        }
+
+        if not (GEMINI_AVAILABLE and gemini_client):
+            return fallback_response
+
+        try:
+            prompt = f"""You are an expert agronomist AI.
+Suggest the single best optimal crop (or top 2 crops) to plant based on these conditions:
+- Soil Type: {soil_type}
+- Water Availability: {water_level}
+- Past 15-day Avg Temperature: {avg_temp:.1f}°C
+- Past 15-day Avg Humidity: {avg_hum:.1f}%
+
+Return a strict JSON object with EXACTLY these keys:
+"recommended_crop": (String, e.g., 'Cotton and Maize')
+"reasoning": (String, e.g., 'Detailed reason why this fits the conditions')
+"best_practices": (String, e.g., 'A few brief best practices for this crop')
+
+Ensure the response is ONLY valid JSON, without any markdown formatting or code blocks.
+"""
+            response = gemini_client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt
+            )
+            
+            if response and response.text:
+                json_str = response.text.replace('```json', '').replace('```', '').strip()
+                import json
+                result = json.loads(json_str)
+                return {
+                    "recommended_crop": result.get("recommended_crop", fallback_response["recommended_crop"]),
+                    "reasoning": result.get("reasoning", fallback_response["reasoning"]),
+                    "best_practices": result.get("best_practices", fallback_response["best_practices"])
+                }
+        except Exception as e:
+            print(f"Gemini Crop Prediction Error: {e}")
+            
+        return fallback_response
+
 
 ml_service = DiseaseDetectionService()

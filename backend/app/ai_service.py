@@ -27,12 +27,12 @@ LANGUAGE_NAMES = {
 # Multilingual local fallback responses
 AI_RESPONSES = {
     "en": {
-        "wheat": "For wheat cultivation, ensure proper irrigation during the tillering and grain filling stages. Apply nitrogen fertilizer in split doses. Watch for yellow rust and aphids. Current market price for wheat is around ₹2,450 per quintal in Delhi.",
+        "wheat": "For wheat cultivation, ensure proper irrigation during the tillering and grain filling stages. Apply nitrogen fertilizer in split doses. Watch for yellow rust and aphids. Current market price for wheat is around Rs.2,450 per quintal in Delhi.",
         "rice": "Rice needs standing water of 5-7cm during vegetative growth. Transplant 25-30 day old seedlings. Use certified seeds for better yield. Basmati varieties are fetching good prices in the market.",
         "tomato": "Tomatoes need regular watering and staking. Watch for early blight and fruit borer. Apply balanced NPK fertilizer every 15 days. Current tomato prices have increased by 5.8% in Bangalore.",
         "potato": "Potatoes require well-drained soil and cool weather. Plant seed potatoes 10-15cm deep. Watch for late blight disease. Store harvested potatoes in cool, dark places.",
-        "onion": "Onions need sunny locations and well-drained soil. Transplant seedlings when they reach pencil thickness. Current onion prices are ₹35/kg in Pune market with a 3.2% increase.",
-        "corn": "Corn requires warm soil temperatures (above 15°C). Plant seeds 2-3cm deep. Ensure adequate spacing for pollination. Sweet corn varieties are in high demand.",
+        "onion": "Onions need sunny locations and well-drained soil. Transplant seedlings when they reach pencil thickness. Current onion prices are Rs.35/kg in Pune market with a 3.2% increase.",
+        "corn": "Corn requires warm soil temperatures (above 15 degrees C). Plant seeds 2-3cm deep. Ensure adequate spacing for pollination. Sweet corn varieties are in high demand.",
         "fertilizer": "Use organic compost along with chemical fertilizers for better soil health. Get your soil tested before applying fertilizers. NPK ratio should be based on crop requirements.",
         "pest": "Identify the pest first using our disease detection feature. Use integrated pest management (IPM) techniques for sustainable control. Neem-based pesticides are effective for organic farming.",
         "irrigation": "Drip irrigation can save 40-50% water and increase yield by 20-30%. Schedule irrigation based on crop growth stage. Early morning or late evening is best for irrigation.",
@@ -42,61 +42,82 @@ AI_RESPONSES = {
         "default": "I'm your Digital Krishi assistant! I can help you with crop management, pest control, fertilizer recommendations, weather updates, and market prices. Please ask specific questions about your farming needs."
     },
     "hi": {
-        "wheat": "गेहूं की खेती के लिए, कल्ले निकलने और दाने भरने की अवधि के दौरान उचित सिंचाई सुनिश्चित करें। नाइट्रोजन उर्वरक को विभाजित खुराक में लगाएं। पीला रतुआ और एफिड्स पर नज़र रखें।",
-        "rice": "धान को वनस्पति विकास के दौरान 5-7 सेमी खड़े पानी की आवश्यकता होती है। 25-30 दिन पुराने पौधों को रोपें। बेहतर उपज के लिए प्रमाणित बीज का उपयोग करें।",
-        "tomato": "टमाटर को नियमित पानी और सहारे की जरूरत होती है। अर्ली ब्लाइट और फ्रूट बोरर के लिए देखें। हर 15 दिनों में संतुलित NPK उर्वरक लगाएं।",
-        "fertilizer": "बेहतर मिट्टी के स्वास्थ्य के लिए रासायनिक उर्वरकों के साथ जैविक खाद का उपयोग करें। उर्वरक लगाने से पहले अपनी मिट्टी की जांच कराएं।",
-        "pest": "समेकित कीट प्रबंधन (IPM) तकनीकों का उपयोग करें। हमारी रोग पहचान सुविधा का उपयोग करके पहले कीट की पहचान करें।",
-        "irrigation": "ड्रिप सिंचाई 40-50% पानी बचा सकती है और उपज को 20-30% बढ़ा सकती है। फसल विकास अवस्था के आधार पर सिंचाई का कार्यक्रम बनाएं।",
-        "default": "मैं आपका Digital Krishi सहायक हूं! मैं फसल प्रबंधन, कीट नियंत्रण, उर्वरक सिफारिशों, मौसम अपडेट और बाजार भाव में आपकी सहायता कर सकता हूं।"
+        "wheat": "Gehun ki kheti ke liye, kalle nikalne aur daane bharne ki avdhi ke dauran uchit sinchai sunishchit karen. Nitrogen urvarak ko vibhajit khurakon mein lagaen. Peela ratua aur aphids par nazar rakhen.",
+        "rice": "Dhan ko vanaspati vikas ke dauran 5-7 cm khade paani ki avashyakta hoti hai. 25-30 din purane paudhon ko ropen. Behtar upaj ke liye pramanit beej ka upyog karen.",
+        "tomato": "Tamatar ko niyamit paani aur sahare ki jaroorat hoti hai. Early blight aur fruit borer se bachao karen. Santulit NPK urvarak ka prayog karen.",
+        "potato": "Aloo ke liye achhi jalnikasi wali mitti aur thanda mausam chahiye. Beej aloo 10-15 cm gehre lagaen. Late blight rog se savdhan rahen.",
+        "onion": "Pyaz ke liye dhoop wali jagah aur achhi jalnikasi wali mitti chahiye. Paudhe ko tab ropen jab ve pencil ki moti ho jaen.",
+        "fertilizer": "Behtar mitti ke swasthya ke liye rasayanik unvarak ke sath jaivik khaad ka upyog karen. Urvarak lagane se pehle mitti ki janch karvaen.",
+        "pest": "Pahle keet ki pahchan karen. Tikau niyantran ke liye entomoloji niyantran (IPM) taknik ka upyog karen.",
+        "irrigation": "Drip sinchai se 40-50% paani ki bachat hoti hai aur upaj 20-30% badhti hai.",
+        "weather": "5-din ka mausam poorvaanuman ke liye hamara mausam widget dekhen.",
+        "market": "Delhi mein gehun ke daam 2.5% upar hain. Mumbai mein chawal ke daam 1.2% neeche hain.",
+        "default": "Main aapka Digital Krishi sahayak hun! Main aapko fasal prabandhan, keet niyantran, urvarak sifarishen, mausam apdets aur bazaar ke bhav mein madad kar sakta hun."
     },
     "ta": {
-        "wheat": "கோதுமை சாகுபடிக்கு, கதிர் உருவாக்கம் மற்றும் மணி நிரப்பும் கட்டத்தில் சரியான நீர்ப்பாசனம் தேவை.",
-        "rice": "நெல் வளர்ச்சியின்போது 5-7 செமீ நிற்கும் நீர் தேவை. 25-30 நாட்கள் பழைய நாற்றுகளை நடவு செய்யவும்.",
-        "fertilizer": "மண் ஆரோக்கியத்திற்கு வேதிப்பொருள் உரங்களுடன் இயற்கை உ�def get_ai_response(message: str, language: str = "en", image_url: str = None, history: List[Dict] = None) -> Dict[str, any]:
+        "wheat": "Kodhumai paiyirchi ku, kodik kadaippiyal matrum maani nirappu kattathalil sari yana neer pathippu tervai. Neytrogen uruvam pakuthi alavu il podungal.",
+        "rice": "Nel vaLarchi yin pOthu 5-7 cm niRkum neer tervai. 25-30 naaL paLaiya naarRukal nadavu seiyavum.",
+        "default": "Naan ungal Digital Krishi udaviyaaLar! Naan ungalukkku paiyir maanaaLam, pOcci kaiyaattu, uruvam parinthurai, vaanil nilai matrum sandai vilaikal il udavalam."
+    },
+    "te": {
+        "wheat": "Godhumai saagu kosam, kanda roopannam mariyu manittu nirappu dasakallo saraina neeti paarana avashyam. Nitrogen eravunu vibhajita maatraallo veyali.",
+        "rice": "Vari varidhi samayamlo 5-7 cm nilabada neeti avashyam. 25-30 roju pata mariyu naathu cheyali.",
+        "default": "Nenu meeru Digital Krishi sahayakudu! Nenu meekku pantula yajamanya, peedakalu niyantrana, eravulu sifaarisu, vaayu guna soochana mariyu marketlu dhara lo sahayapadadamu."
+    },
+    "mr": {
+        "wheat": "Gahu peekaasaathee, kalli yeNyaachya ani daaNe bharNyaachya avasthit yogya sinchan sUnishchit kara. Nitrogen khata vibhajit maatraat dyaa.",
+        "rice": "Bhat pikaala vanaspatik vaadhaachya veLi 5-7 cm ubhe paaNi laagate. 25-30 divsaanchya puraanchya ropyaa lavaav yaat.",
+        "default": "Mi tumcha Digital Krishi sahayak aahe! Mi tumhala pikaacha vyavasthapan, keedak niyantran, khataachya shiphaarasi, havamaan mahiti ani baazaarabhav yaamadhe madad karu shaktoo."
+    }
+}
+
+SUGGESTIONS = {
+    "en": ["Wheat cultivation tips", "Pest control guidelines", "Identify disease", "Check latest market prices", "Today's weather forecast"],
+    "hi": ["Gehun ki kheti", "Keet niyantran", "Bazaar bhav", "Aaj ka mausam", "Urvarak ki jaankari"],
+    "ta": ["Paiyir saagubadi", "Urvaram parinthurai", "Sandai vilaikal", "Vaanil munanRivippu"],
+    "te": ["Godhumai saagu chittkaalu", "Vari saagu guide", "Peedakula niyantrana", "Eravulu sifaarisu", "Market dhara", "Vaayu guna anchanam"],
+    "mr": ["Gahu lagvad tips", "Bhat lagvad margadarshak", "Keed niyantran kase karaave", "Khata shiphaarasi", "Aajache baazar bhaav", "Havaman andaz"]
+}
+
+
+async def get_ai_response(
+    message: str,
+    language: str = "en",
+    user_id: int = None,
+    chat_history: List[Dict] = None,
+    image_url: str = None
+) -> Dict[str, any]:
     """
-    Get AI response for farmer query.
-    Uses Gemini API (same API key as disease detection) as primary,
-    falls back to local keyword-based responses if unavailable.
+    Get AI response using Gemini (primary) with local fallback.
     """
-    # ===== TRY GEMINI FIRST =====
+    if chat_history is None:
+        chat_history = []
+
+    language = language if language in LANGUAGE_NAMES else "en"
+    lang_name = LANGUAGE_NAMES[language]
+
+    # ===== GEMINI AI =====
     if GEMINI_AVAILABLE and gemini_client:
         try:
-            lang_name = LANGUAGE_NAMES.get(language, "English")
-
-            system_prompt = f"""You are Digital Krishi AI — a smart, friendly farming assistant for Indian farmers.
-
-LANGUAGE INSTRUCTION: You MUST respond entirely in {lang_name}. Every word of your response must be in {lang_name}.
-{"If the language is Hindi, respond in Devanagari script (हिंदी)." if language == "hi" else ""}
-{"If the language is Tamil, respond in Tamil script (தமிழ்)." if language == "ta" else ""}
-{"If the language is Telugu, respond in Telugu script (తెలుగు)." if language == "te" else ""}
-{"If the language is Marathi, respond in Devanagari script (मराठी)." if language == "mr" else ""}
-
-EXPERTISE: You are an expert in Indian agriculture — crops, pests, diseases, fertilizers, organic farming, irrigation, weather impact, market prices, and government schemes (PM-KISAN, Fasal Bima Yojana, KCC, etc.).
-
-RULES:
-1. Give practical, actionable advice that a real farmer can follow immediately
-2. Include specific product names, dosages, and timing when relevant
-3. Mention approximate Indian market prices when discussing crops
-4. Keep responses concise (max 200 words) but information-dense
-5. Use simple language that a farmer can understand
-6. If asked about weather, provide general seasonal guidance
-7. Always be encouraging and supportive"""
-
-            # Prepare contents with history and current message
+            system_instructions = f"""You are Digital Krishi, an expert AI assistant for Indian farmers.
+Always respond in {lang_name} language.
+You specialize in: crop cultivation, pest control, fertilizer recommendations, weather-based farming advice, government schemes, market prices, and agricultural technology.
+Keep responses practical, concise, and relevant to Indian farming conditions.
+If asked in Hindi/Tamil/Telugu/Marathi, respond fully in that language.
+"""
+            # Build conversation history for context
             contents = []
-            
-            # Add History
-            if history:
-                for h in history:
-                    contents.append({
-                        "role": "user" if h["type"] == "user" else "model",
-                        "parts": [{"text": h["content"]}]
-                    })
-            
-            # Add current message with system instructions on the first one or as a prefix
-            current_user_parts = [{"text": system_prompt + "\n\nFarmer's current question: " + message}]
-            
+
+            # Add chat history for context (last 6 messages)
+            for hist in chat_history[-6:]:
+                role = hist.get("role", "user")
+                content = hist.get("content", "")
+                if role in ("user", "model") and content:
+                    contents.append({"role": role, "parts": [{"text": content}]})
+
+            # Build current user parts
+            current_user_parts = [{"text": system_instructions + "\n\nUser: " + message}]
+
             # Add image if provided
             if image_url:
                 try:
@@ -108,7 +129,7 @@ RULES:
                         current_user_parts.append(img)
                 except Exception as e:
                     print(f"Error loading image for chat: {e}")
-            
+
             contents.append({
                 "role": "user",
                 "parts": current_user_parts
@@ -124,75 +145,7 @@ RULES:
                 print(f"2.5-flash failed, falling back to flash-latest. Error: {e}")
                 response = gemini_client.models.generate_content(
                     model='gemini-flash-latest',
-                    contents=contents
-                )
-
-            if response and response.text:
-                ai_text = response.text.strip()
-                suggestions = SUGGESTIONS.get(language, SUGGESTIONS["en"])
-                print(f"Gemini AI response generated for language: {language}")
-                return {
-                    "response": ai_text,
-                    "suggestions": suggestions[:5]
-                }�ப்பாடு", "உர பரிந்துரை", "சந்தை விலைகள்", "வானிலை முன்னறிவிப்பு"],
-    "te": ["గోధుమ సాగు చిట్కాలు", "వరి సాగు గైడ్", "పీడకుల నియంత్రణ", "ఎరువు సిఫార్సు", "మార్కెట్ ధరలు", "వాతావరణ అంచనా"],
-    "mr": ["गहू लागवड टिप्स", "भात लागवड मार्गदर्शक", "कीड नियंत्रण कसे करावे", "खत शिफारसी", "आजचे बाजार भाव", "हवामान अंदाज"]
-}
-
-
-def get_ai_response(message: str, language: str = "en", image_url: str = None) -> Dict[str, any]:
-    """
-    Get AI response for farmer query.
-    Uses Gemini API (same API key as disease detection) as primary,
-    falls back to local keyword-based responses if unavailable.
-    """
-    # ===== TRY GEMINI FIRST =====
-    if GEMINI_AVAILABLE and gemini_client:
-        try:
-            lang_name = LANGUAGE_NAMES.get(language, "English")
-
-            system_prompt = f"""You are Digital Krishi AI — a smart, friendly farming assistant for Indian farmers.
-
-LANGUAGE INSTRUCTION: You MUST respond entirely in {lang_name}. Every word of your response must be in {lang_name}.
-{"If the language is Hindi, respond in Devanagari script (हिंदी)." if language == "hi" else ""}
-{"If the language is Tamil, respond in Tamil script (தமிழ்)." if language == "ta" else ""}
-{"If the language is Telugu, respond in Telugu script (తెలుగు)." if language == "te" else ""}
-{"If the language is Marathi, respond in Devanagari script (मराठी)." if language == "mr" else ""}
-
-EXPERTISE: You are an expert in Indian agriculture — crops, pests, diseases, fertilizers, organic farming, irrigation, weather impact, market prices, and government schemes (PM-KISAN, Fasal Bima Yojana, KCC, etc.).
-
-RULES:
-1. Give practical, actionable advice that a real farmer can follow immediately
-2. Include specific product names, dosages, and timing when relevant
-3. Mention approximate Indian market prices when discussing crops
-4. Keep responses concise (max 200 words) but information-dense
-5. Use simple language that a farmer can understand
-6. If asked about weather, provide general seasonal guidance
-7. Always be encouraging and supportive"""
-
-            parts = [{"text": system_prompt + "\n\nFarmer's question: " + message}]
-            if image_url:
-                try:
-                    from PIL import Image
-                    filename = os.path.basename(image_url)
-                    local_path = os.path.join(os.getcwd(), "static", "uploads", filename)
-                    if os.path.exists(local_path):
-                        img = Image.open(local_path)
-                        parts.append(img)
-                except Exception as e:
-                    print(f"Error loading image for chat: {e}")
-
-            try:
-                response = gemini_client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=[{"role": "user", "parts": parts}]
-                )
-            except Exception as e:
-                # Fallback to flash-latest if 2.5 has exhausted free-tier quotas or hangs
-                print(f"2.5-flash failed, falling back to flash-latest. Error: {e}")
-                response = gemini_client.models.generate_content(
-                    model='gemini-flash-latest',
-                    contents=[{"role": "user", "parts": parts}]
+                    contents=[{"role": "user", "parts": current_user_parts}]
                 )
 
             if response and response.text:
@@ -221,21 +174,21 @@ def _get_local_response(message: str, language: str = "en") -> Dict[str, any]:
 
     # Keyword mapping (supports multiple languages)
     keyword_map = {
-        "wheat": ["wheat", "गेहूं", "gahun", "గోధుమ", "கோதுமை", "गहू"],
-        "rice": ["rice", "धान", "dhan", "వరి", "நெல்", "भात"],
-        "tomato": ["tomato", "टमाटर", "tamatar", "టమాటో", "தக்காளி"],
-        "potato": ["potato", "आलू", "aloo"],
-        "onion": ["onion", "प्याज", "pyaz", "कांदा"],
-        "corn": ["corn", "मकई", "makai", "మొక్కజొన్న"],
-        "fertilizer": ["fertilizer", "उर्वरक", "urvarak", "ఎరువు", "உரம்", "खत", "khad"],
-        "pest": ["pest", "कीट", "keet", "పీడకు", "பூச்சி", "कीड"],
-        "irrigation": ["irrigation", "सिंचाई", "sichai", "నీటిపారుదల", "நீர்ப்பாசனம்", "सिंचन"],
-        "organic": ["organic", "जैविक", "jaivik", "సేంద్రీయ", "இயற்கை", "सेंद्रिय"],
-        "weather": ["weather", "मौसम", "mausam", "వాతావరణం", "வானிலை", "हवामान"],
-        "market": ["market", "बाजार", "bazaar", "bazar", "మార్కెట్", "சந்தை"],
+        "wheat": ["wheat", "gehun", "gahun", "godhumai", "gahu"],
+        "rice": ["rice", "dhan", "vari", "nel", "bhat"],
+        "tomato": ["tomato", "tamatar", "tamato"],
+        "potato": ["potato", "aloo"],
+        "onion": ["onion", "pyaz", "kanda"],
+        "corn": ["corn", "makai", "mokka"],
+        "fertilizer": ["fertilizer", "urvarak", "urvaram", "eravunu", "khata", "khad"],
+        "pest": ["pest", "keet", "pUcci", "peedaku", "keedak"],
+        "irrigation": ["irrigation", "sinchai", "neer", "neeti", "paarana", "sinchan"],
+        "organic": ["organic", "jaivik", "iyal", "sendriva", "kendriva"],
+        "weather": ["weather", "mausam", "havamaan", "vaayu", "mausam"],
+        "market": ["market", "bazaar", "bazar", "sandai", "marketu"],
     }
 
-    response_text = responses.get("default", responses.get("default", "I'm here to help with farming questions."))
+    response_text = responses.get("default", "I'm here to help with farming questions.")
 
     for key, keywords in keyword_map.items():
         for kw in keywords:
@@ -258,13 +211,13 @@ def get_weather_agricultural_advice(current_weather: dict, forecast_summary: str
     Get dynamic AI suggestions for water level and fertilizer application timing
     based on current weather and forecast (history/future).
     """
-    
+
     def get_heuristic_advice(cw):
         temp = cw.get("temp", 25)
         humidity = cw.get("humidity", 50)
         wind_speed = cw.get("wind_speed", 10)
         condition = cw.get("condition", "").lower()
-        
+
         # Agricultural heuristics for water management
         water_level = "Normal irrigation required to maintain soil moisture."
         if temp > 35 and humidity < 40:
@@ -275,7 +228,7 @@ def get_weather_agricultural_advice(current_weather: dict, forecast_summary: str
             water_level = "High humidity detected. Reduce water volume. Ensure proper field drainage."
         elif temp > 30:
             water_level = "Maintain adequate soil moisture. Short, frequent irrigation is recommended."
-        
+
         # Agricultural heuristics for fertilizer timing
         fertilizer = "Optimum conditions for standard fertilizer application schedule."
         if "rain" in condition or "thunderstorm" in condition or humidity > 85:
@@ -286,7 +239,7 @@ def get_weather_agricultural_advice(current_weather: dict, forecast_summary: str
             fertilizer = "Heat stress possible. Avoid chemical fertilizers to prevent leaf burn. Use organic mulch."
         elif 20 <= temp <= 30 and humidity < 75:
             fertilizer = "Excellent conditions! Proceed with scheduled nutrient top-dressing or foliar spraying."
-            
+
         return {
             "water_level": water_level,
             "fertilizer_timing": fertilizer
@@ -303,16 +256,16 @@ Given the following current weather and forecast data, provide exactly two pract
 Keep advice concise (1-2 sentences each). Do not use markdown or list numbers. Return the two suggestions separated by the delimiter '|'.
 Format: <water_level_advice> | <fertilizer_timing_advice>
 """
-        
-        user_prompt = f"Current Weather: Temp: {current_weather.get('temp')}°C, Humidity: {current_weather.get('humidity')}%, Wind: {current_weather.get('wind_speed')} km/h, Condition: {current_weather.get('condition')}\nForecast/History: {forecast_summary}"
-        
+
+        user_prompt = f"Current Weather: Temp: {current_weather.get('temp')}C, Humidity: {current_weather.get('humidity')}%, Wind: {current_weather.get('wind_speed')} km/h, Condition: {current_weather.get('condition')}\nForecast/History: {forecast_summary}"
+
         response = gemini_client.models.generate_content(
             model='gemini-2.5-flash',
             contents=[
                 {"role": "user", "parts": [{"text": system_prompt + "\n\n" + user_prompt}]}
             ]
         )
-        
+
         if response and response.text:
             parts = response.text.strip().split('|')
             if len(parts) >= 2:
@@ -322,7 +275,6 @@ Format: <water_level_advice> | <fertilizer_timing_advice>
                 }
     except Exception as e:
         print(f"Gemini Weather Advice Error: {e}")
-        
+
     # Fallback if Gemini fails or rate limited
     return get_heuristic_advice(current_weather)
-

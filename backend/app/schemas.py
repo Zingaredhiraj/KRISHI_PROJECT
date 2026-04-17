@@ -23,7 +23,7 @@ class Language(str, Enum):
 
 # User Schemas
 class UserBase(BaseModel):
-    phone: str
+    phone: Optional[str] = None
     name: Optional[str] = None
     email: Optional[str] = None
     location: Optional[str] = None
@@ -89,11 +89,16 @@ class WeatherDataResponse(BaseModel):
 # Market Price Schemas
 class MarketPriceResponse(BaseModel):
     id: int
-    crop: str
-    price: Decimal
-    unit: str
+    state: str
+    district: Optional[str] = None
+    taluka: Optional[str] = None
     market: str
-    change_percent: Optional[Decimal]
+    crop: str
+    min_price: Optional[Decimal] = None
+    max_price: Optional[Decimal] = None
+    modal_price: Decimal
+    unit: str
+    date: date
     recorded_at: datetime
     
     class Config:
@@ -145,6 +150,19 @@ class DiseaseDetectionResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+# Crop Prediction Schemas
+class CropPredictionRequest(BaseModel):
+    soil_type: str
+    water_level: str
+    temperature_history: List[float]
+    humidity_history: List[float]
+
+class CropPredictionResponse(BaseModel):
+    recommended_crop: str
+    reasoning: str
+    best_practices: str
+
 
 # ── Community: Enums ──────────────────────────────────────────────────────────
 class PostMediaType(str, Enum):
@@ -307,10 +325,35 @@ class SchemeResponse(BaseModel):
     deadline: Optional[date]
     documents_required: Optional[List[str]]
     application_link: Optional[str]
+    
+    # Categorization
+    category: Optional[str] = "Central"
+    status: Optional[str] = "Current"
+    state_name: Optional[str] = None
+    
+    # Eligibility Criteria
+    min_age: Optional[int] = None
+    max_income: Optional[Decimal] = None
+    min_land_acres: Optional[Decimal] = None
+    eligible_categories: Optional[str] = None
+    
     is_active: bool
+    created_at: datetime
     
     class Config:
         from_attributes = True
+
+# Eligibility Check Schemas
+class EligibilityCheckRequest(BaseModel):
+    age: int
+    annual_income: Decimal
+    land_size_acres: Decimal
+    category: str  # General, SC, ST, OBC
+    state: Optional[str] = None
+
+class EligibilityCheckResponse(BaseModel):
+    eligible_schemes: List[SchemeResponse]
+    total_found: int
 
 # Document Schemas
 class DocumentCreate(BaseModel):
@@ -410,3 +453,15 @@ class UserProfileDashboard(BaseModel):
     recent_scans: List[Any] = []
     recent_ai_queries: List[Any] = []
     recent_posts: List[Any] = []
+
+class NewsArticleResponse(BaseModel):
+    id: int
+    title: str
+    source: str
+    url: str
+    image_url: Optional[str] = None
+    content: Optional[str] = None
+    published_at: datetime
+    
+    class Config:
+        from_attributes = True

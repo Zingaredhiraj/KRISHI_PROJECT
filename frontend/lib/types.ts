@@ -116,7 +116,15 @@ export interface GovernmentScheme {
   deadline?: string;
   documents_required?: string[];
   application_link?: string;
+  category?: string;
+  status?: string;
+  state_name?: string;
+  min_age?: number;
+  max_income?: number;
+  min_land_acres?: number;
+  eligible_categories?: string;
   is_active: boolean;
+  created_at: string;
 }
 
 export interface UserDocument {
@@ -185,4 +193,14 @@ export interface ProfileDashboard {
   recent_scans: DiseaseDetection[];
   recent_ai_queries: ChatMessage[];
   recent_posts: CommunityPost[];
+}
+
+export interface NewsArticle {
+  id: number;
+  title: string;
+  source: string;
+  url: string;
+  image_url?: string;
+  content?: string;
+  published_at: string;
 }

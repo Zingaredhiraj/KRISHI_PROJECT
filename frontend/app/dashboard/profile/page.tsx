@@ -281,8 +281,8 @@ export default function ProfilePage() {
                                 )}
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-gray-500">
                                     <span className="flex items-center gap-1.5">
-                                        <Phone className="w-3.5 h-3.5 text-gray-400" />
-                                        +91 {user?.phone}
+                                        <Mail className="w-3.5 h-3.5 text-gray-400" />
+                                        {user?.email || 'No email saved'}
                                     </span>
                                     {editing ? (
                                         <Input value={editLocation} onChange={e => setEditLocation(e.target.value)}
@@ -293,10 +293,10 @@ export default function ProfilePage() {
                                             {user.location}
                                         </span>
                                     ) : null}
-                                    {user?.email && !editing && (
+                                    {user?.phone && !editing && (
                                         <span className="flex items-center gap-1.5">
-                                            <Mail className="w-3.5 h-3.5 text-gray-400" />
-                                            {user.email}
+                                            <Phone className="w-3.5 h-3.5 text-gray-400" />
+                                            +91 {user.phone}
                                         </span>
                                     )}
                                     <span className="flex items-center gap-1.5">

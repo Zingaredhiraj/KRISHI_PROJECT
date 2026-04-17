@@ -1,0 +1,180 @@
+INFO:     127.0.0.1:56956 - "POST /api/auth/otp/verify HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:43292 - "POST /api/auth/otp/verify HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:35354 - "POST /api/auth/otp/verify HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43316 - "POST /api/auth/otp/send HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52574 - "POST /api/auth/otp/verify HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51172 - "OPTIONS /api/auth/profile HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51182 - "PUT /api/auth/profile HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:52068 - "PUT /api/auth/profile HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:39824 - "PUT /api/auth/profile HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:34328 - "PUT /api/auth/profile HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:40776 - "OPTIONS /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40780 - "OPTIONS /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40790 - "OPTIONS /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40794 - "OPTIONS /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "OPTIONS /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40776 - "OPTIONS /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40780 - "OPTIONS /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40790 - "OPTIONS /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40794 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40794 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40818 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "OPTIONS /api/weather/current?location=Pune HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "OPTIONS /api/ai/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40818 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40834 - "OPTIONS /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+Gemini AI response generated for language: mr
+Weather API Error: 
+INFO:     127.0.0.1:40794 - "GET /api/weather/current?location=Pune HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40838 - "POST /api/ai/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40790 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40790 - "OPTIONS /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40806 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40838 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40838 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40934 - "GET /uploads/f000672f080c4606917f3e6fff5397c0.jpeg HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:40950 - "OPTIONS /api/community/follow/3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40982 - "OPTIONS /api/community/posts/24/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52188 - "OPTIONS /api/community/posts/24/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40982 - "OPTIONS /api/community/posts/24/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52188 - "OPTIONS /api/community/posts/24/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40958 - "POST /api/community/follow/3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40950 - "POST /api/community/follow/3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40962 - "POST /api/community/follow/3 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:52202 - "OPTIONS /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40972 - "POST /api/community/follow/3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52202 - "OPTIONS /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52188 - "POST /api/community/posts/24/like HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:52202 - "GET /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40982 - "POST /api/community/posts/24/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40958 - "POST /api/community/posts/24/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52202 - "GET /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40950 - "POST /api/community/posts/24/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56476 - "OPTIONS /api/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56476 - "POST /api/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56476 - "PUT /api/auth/profile HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:40972 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59548 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59540 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59528 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59528 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59540 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59548 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59522 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59522 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56490 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56490 - "GET /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59550 - "GET /uploads/4eeb42fa7b834328b4a7b2230e43b769.jpeg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56490 - "GET /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59508 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56490 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34606 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34604 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56490 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34606 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34604 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59508 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34606 - "GET /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59508 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34606 - "GET /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56490 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59508 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34604 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34604 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59508 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56490 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34606 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59522 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59522 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34604 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56056 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59522 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56042 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56056 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59522 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56042 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34604 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34604 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56052 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45416 - "POST /api/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45430 - "GET /uploads/4e682335006c4a228e25e5abe9cd7050.jpg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56052 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56052 - "OPTIONS /api/disease/detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45416 - "POST /api/disease/detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45400 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45400 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55500 - "OPTIONS /api/community/posts/25/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55500 - "POST /api/community/posts/25/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55500 - "OPTIONS /api/community/posts/25/comments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55500 - "OPTIONS /api/community/posts/25/comments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52646 - "POST /api/community/posts/25/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55514 - "POST /api/community/posts/25/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52646 - "OPTIONS /api/community/posts/25/comments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52664 - "POST /api/community/posts/25/like HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:52678 - "POST /api/community/posts/25/like HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:52662 - "POST /api/community/posts/25/like HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55500 - "GET /api/community/posts/25/comments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55500 - "GET /api/community/posts/25/comments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55514 - "POST /api/community/posts/25/comments HTTP/1.1" 201 Created
+INFO:     127.0.0.1:55514 - "GET /api/community/posts/25/comments HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41170 - "GET /uploads/4e682335006c4a228e25e5abe9cd7050.jpg HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:37016 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36980 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37012 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37016 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37012 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36980 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36978 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36978 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50200 - "POST /api/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50202 - "GET /uploads/5a084409c09644e7905a37da1a08ef61.jpg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36996 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36996 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50200 - "POST /api/disease/detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50206 - "POST /api/disease/detect HTTP/1.1" 200 OK
+Gemini Fallback Error: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\nPlease retry in 53.945174964s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quotaValue': '5'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '53s'}]}}
+INFO:     127.0.0.1:50206 - "POST /api/disease/detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58654 - "POST /api/disease/detect HTTP/1.1" 200 OK
+Gemini Fallback Error: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\nPlease retry in 53.338255426s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quotaValue': '5'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '53s'}]}}
+INFO:     127.0.0.1:50206 - "POST /api/disease/detect HTTP/1.1" 200 OK
+Gemini Fallback Error: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 5, model: gemini-2.5-flash\nPlease retry in 52.924912058s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '5'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '52s'}]}}
+INFO:     127.0.0.1:58654 - "POST /api/disease/detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36996 - "POST /api/disease/detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58666 - "POST /api/disease/detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50200 - "POST /api/disease/detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50212 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50212 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55854 - "GET /api/profile/dashboard HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:44424 - "GET /api/profile/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44426 - "GET /uploads/4eeb42fa7b834328b4a7b2230e43b769.jpeg HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56296 - "OPTIONS /api/auth/profile HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56310 - "PUT /api/auth/profile HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:53542 - "PUT /api/auth/profile HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:58216 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58228 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58232 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58228 - "GET /api/market/prices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58232 - "GET /api/schemes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58216 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58242 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58242 - "GET /api/weather/current?lat=23.024349&lon=72.5301521 HTTP/1.1" 200 OK
+Gemini AI response generated for language: hi
+INFO:     127.0.0.1:54142 - "POST /api/ai/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58230 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58230 - "GET /api/notifications HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57380 - "GET /api/community/posts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57380 - "GET /api/notifications HTTP/1.1" 200 OK
+Gemini AI response generated for language: hi
+INFO:     127.0.0.1:41990 - "POST /api/ai/chat HTTP/1.1" 200 OK
+Gemini AI response generated for language: hi
+INFO:     127.0.0.1:52502 - "POST /api/ai/chat HTTP/1.1" 200 OK

@@ -50,9 +50,9 @@ export default api;
 // ================= AUTH =================
 //
 export const authApi = {
-  sendOTP: (phone: string) => api.post("/auth/otp/send", { phone }),
-  verifyOTP: (phone: string, otp: string) =>
-    api.post("/auth/otp/verify", { phone, otp }),
+  sendOTP: (email: string) => api.post("/auth/otp/send", { email }),
+  verifyOTP: (email: string, otp: string) =>
+    api.post("/auth/otp/verify", { email, otp }),
   getMe: () => api.get("/auth/me"),
   updateProfile: (data: Partial<{
     name: string;
@@ -79,6 +79,18 @@ export const weatherApi = {
 export const marketApi = {
   getPrices: (params?: { crop?: string; market?: string }) =>
     api.get("/market/prices", { params }),
+  getMarketPrices: (params?: {
+    taluka?: string;
+    crop?: string;
+    district?: string;
+    state?: string;
+    date?: string;
+    sort_by?: string;
+    offset?: number;
+    limit?: number;
+  }) => api.get("/market/prices", { params }),
+  getDistricts: (params?: { state?: string }) => api.get("/market/districts", { params }),
+  getStats: (params?: { state?: string }) => api.get("/market/stats", { params }),
   getHistory: (crop: string, market: string, days?: number) =>
     api.get("/market/history", { params: { crop, market, days } }),
 };
@@ -102,6 +114,31 @@ export const diseaseApi = {
 };
 
 //
+// ================= CROP PREDICTION =================
+//
+export const cropApi = {
+  predict: (data: {
+    soil_type: string;
+    water_level: string;
+    temperature_history: number[];
+    humidity_history: number[];
+  }) => api.post("/crop/predict", data),
+};
+
+//
+// ================= ELIGIBILITY =================
+//
+export const eligibilityApi = {
+  check: (data: {
+    age: number;
+    annual_income: number;
+    land_size_acres: number;
+    category: string;
+    state?: string;
+  }) => api.post("/eligibility/check", data),
+};
+
+//
 // ================= COMMUNITY =================
 //
 export const communityApi = {
@@ -121,15 +158,37 @@ export const communityApi = {
     api.post(`/community/posts/${postId}/comments`, { content }),
   getComments: (postId: number) =>
     api.get(`/community/posts/${postId}/comments`),
+  followUser: (userId: number) =>
+    api.post(`/community/follow/${userId}`),
+  sharePost: (postId: number, platform: string = "in_app") =>
+    api.post(`/community/posts/${postId}/share`, { share_platform: platform }),
 };
 
 //
 // ================= SCHEMES =================
 //
 export const schemesApi = {
-  getAll: (language?: Language) =>
-    api.get("/schemes", { params: { language } }),
+  getAll: (params?: {
+    category?: string;
+    status?: string;
+    state?: string;
+    search?: string;
+    limit?: number;
+    offset?: number;
+    language?: Language;
+  }) => api.get("/schemes", { params }),
   getById: (id: number) => api.get(`/schemes/${id}`),
+  apply: (schemeId: number) => api.post(`/schemes/${schemeId}/apply`),
+};
+
+//
+// ================= NEWS =================
+//
+export const newsApi = {
+  getAll: () => api.get("/news"),
+  getById: (id: number) => api.get(`/news/${id}`),
+  getRealTime: (params?: { category?: string; search?: string; limit?: number }) =>
+    api.get("/news/realtime", { params }),
 };
 
 //
