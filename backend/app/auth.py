@@ -16,7 +16,11 @@ load_dotenv()
 
 # ================= SECURITY CONFIG =================
 
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+if not SECRET_KEY:
+    SECRET_KEY = "dev-only-insecure-secret-do-not-use-in-production"
+    if os.getenv("ENVIRONMENT", "development").lower() in {"production", "prod"}:
+        raise RuntimeError("SECRET_KEY is required in production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
@@ -75,6 +79,26 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="User not found")
 
     return user
+
+
+async def get_optional_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    """Return authenticated user if token present and valid, otherwise None without raising 401"""
+    if credentials is None:
+        return None
+    try:
+        token = credentials.credentials
+        payload = verify_token(token)
+        if not payload:
+            return None
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+        return db.query(User).filter(User.id == int(user_id)).first()
+    except Exception:
+        return None
 
 
 async def get_current_active_user(

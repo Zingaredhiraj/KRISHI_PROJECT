@@ -285,7 +285,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: '01', title: 'Register with Phone', desc: 'Enter your mobile number and verify with OTP. Complete your farmer profile with crop preferences.', icon: '📱' },
+              { step: '01', title: 'Sign In with Email', desc: 'Enter your email address for instant access. Complete your farmer profile with crop preferences.', icon: '📱' },
               { step: '02', title: 'Explore Features', desc: 'Access AI assistant, scan crops for diseases, check market prices and weather forecasts.', icon: '🌾' },
               { step: '03', title: 'Grow Your Farm', desc: 'Get personalized recommendations, connect with community, and apply for government schemes.', icon: '🚀' },
             ].map((item, i) => (

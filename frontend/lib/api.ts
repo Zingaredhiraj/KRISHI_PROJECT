@@ -50,8 +50,9 @@ export default api;
 // ================= AUTH =================
 //
 export const authApi = {
+  login: (email: string) => api.post("/auth/login", { email }),
   sendOTP: (email: string) => api.post("/auth/otp/send", { email }),
-  verifyOTP: (email: string, otp: string) =>
+  verifyOTP: (email: string, otp?: string) =>
     api.post("/auth/otp/verify", { email, otp }),
   getMe: () => api.get("/auth/me"),
   updateProfile: (data: Partial<{
@@ -108,8 +109,8 @@ export const chatApi = {
 // ================= DISEASE =================
 //
 export const diseaseApi = {
-  detect: (image_url: string) =>
-    api.post("/disease/detect", { image_url }),
+  detect: (image_url: string, crop_hint?: string) =>
+    api.post("/disease/detect", { image_url, crop_hint: crop_hint || undefined }),
   getHistory: () => api.get("/disease/history"),
 };
 

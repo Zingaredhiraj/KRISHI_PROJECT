@@ -41,20 +41,36 @@ router = APIRouter(prefix="/community", tags=["Community"])
 #  Helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _build_post_response(post: models.CommunityPost,
-                          current_user: models.User,
-                          db: Session) -> schemas.PostResponse:
-    """Convert ORM post → Pydantic PostResponse, injecting per‑user flags."""
-    # Tag names
+def _build_post_response(
+    post: models.CommunityPost,
+    current_user: models.User,
+    db: Session,
+    liked_post_ids: Optional[set] = None,
+    saved_post_ids: Optional[set] = None,
+    following_user_ids: Optional[set] = None,
+) -> schemas.PostResponse:
+    """Convert ORM post → Pydantic PostResponse, injecting per‑user flags (O(1) if prefetched)."""
     tag_names = [pt.tag.name for pt in post.post_tags] if post.post_tags else []
 
-    # Per‑user state
-    is_liked = db.query(models.PostLike).filter_by(
-        post_id=post.id, user_id=current_user.id).first() is not None
-    is_saved = db.query(models.PostSave).filter_by(
-        post_id=post.id, user_id=current_user.id).first() is not None
-    is_following = db.query(models.UserFollow).filter_by(
-        follower_id=current_user.id, following_id=post.user_id).first() is not None
+    # Per‑user state: O(1) set lookup if batched, fallback to DB query if single post
+    if liked_post_ids is not None:
+        is_liked = post.id in liked_post_ids
+    else:
+        is_liked = db.query(models.PostLike).filter_by(
+            post_id=post.id, user_id=current_user.id).first() is not None
+
+    if saved_post_ids is not None:
+        is_saved = post.id in saved_post_ids
+    else:
+        is_saved = db.query(models.PostSave).filter_by(
+            post_id=post.id, user_id=current_user.id).first() is not None
+
+    if following_user_ids is not None:
+        is_following = post.user_id in following_user_ids
+    else:
+        is_following = db.query(models.UserFollow).filter_by(
+            follower_id=current_user.id, following_id=post.user_id).first() is not None
+
 
     return schemas.PostResponse(
         id=post.id,
@@ -87,6 +103,49 @@ def _build_post_response(post: models.CommunityPost,
         is_saved=is_saved,
         is_following_author=is_following,
     )
+
+
+def _batch_build_post_responses(
+    posts: List[models.CommunityPost],
+    current_user: models.User,
+    db: Session
+) -> List[schemas.PostResponse]:
+    """Batch-fetch interaction flags in 3 queries instead of 3xN queries (solves N+1 bottleneck)."""
+    if not posts:
+        return []
+    post_ids = [p.id for p in posts]
+    author_ids = [p.user_id for p in posts]
+
+    liked_ids = {
+        r[0] for r in db.query(models.PostLike.post_id).filter(
+            models.PostLike.user_id == current_user.id,
+            models.PostLike.post_id.in_(post_ids)
+        ).all()
+    }
+    saved_ids = {
+        r[0] for r in db.query(models.PostSave.post_id).filter(
+            models.PostSave.user_id == current_user.id,
+            models.PostSave.post_id.in_(post_ids)
+        ).all()
+    }
+    following_ids = {
+        r[0] for r in db.query(models.UserFollow.following_id).filter(
+            models.UserFollow.follower_id == current_user.id,
+            models.UserFollow.following_id.in_(author_ids)
+        ).all()
+    }
+
+    return [
+        _build_post_response(
+            p,
+            current_user,
+            db,
+            liked_post_ids=liked_ids,
+            saved_post_ids=saved_ids,
+            following_user_ids=following_ids,
+        )
+        for p in posts
+    ]
 
 
 def _sync_tags(post: models.CommunityPost, tag_names: List[str], db: Session):
@@ -177,7 +236,7 @@ def list_posts(
     page = (skip // limit) + 1 if limit else 1
 
     return schemas.FeedResponse(
-        posts=[_build_post_response(p, current_user, db) for p in posts],
+        posts=_batch_build_post_responses(posts, current_user, db),
         total=total,
         page=page,
         page_size=limit,
@@ -323,8 +382,14 @@ def toggle_like(
         db.add(models.PostLike(post_id=post_id, user_id=current_user.id))
         post.likes_count = (post.likes_count or 0) + 1
         liked = True
+    from sqlalchemy.exc import IntegrityError
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        liked = db.query(models.PostLike).filter_by(
+            post_id=post_id, user_id=current_user.id).first() is not None
 
-    db.commit()
     return schemas.PostLikeResponse(
         id=post_id, post_id=post_id, user_id=current_user.id,
         liked=liked, new_count=post.likes_count
@@ -356,8 +421,14 @@ def toggle_save(
         db.add(models.PostSave(post_id=post_id, user_id=current_user.id))
         post.saves_count = (post.saves_count or 0) + 1
         saved = True
+    from sqlalchemy.exc import IntegrityError
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        saved = db.query(models.PostSave).filter_by(
+            post_id=post_id, user_id=current_user.id).first() is not None
 
-    db.commit()
     return schemas.SaveResponse(post_id=post_id, saved=saved, new_count=post.saves_count)
 
 
@@ -612,7 +683,7 @@ def home_feed(
     posts = feed_q.offset(offset).limit(page_size).all()
 
     return schemas.FeedResponse(
-        posts=[_build_post_response(p, current_user, db) for p in posts],
+        posts=_batch_build_post_responses(posts, current_user, db),
         total=total,
         page=page,
         page_size=page_size,
@@ -651,7 +722,7 @@ def trending_feed(
     posts = q.offset(offset).limit(page_size).all()
 
     return schemas.FeedResponse(
-        posts=[_build_post_response(p, current_user, db) for p in posts],
+        posts=_batch_build_post_responses(posts, current_user, db),
         total=total, page=page, page_size=page_size,
         has_next=(offset + page_size) < total,
     )
@@ -689,7 +760,7 @@ def latest_feed(
     posts = q.offset(offset).limit(page_size).all()
 
     return schemas.FeedResponse(
-        posts=[_build_post_response(p, current_user, db) for p in posts],
+        posts=_batch_build_post_responses(posts, current_user, db),
         total=total, page=page, page_size=page_size,
         has_next=(offset + page_size) < total,
     )
@@ -733,7 +804,7 @@ def saved_feed(
         posts = [id_map[pid] for pid in page_ids if pid in id_map]
 
     return schemas.FeedResponse(
-        posts=[_build_post_response(p, current_user, db) for p in posts],
+        posts=_batch_build_post_responses(posts, current_user, db),
         total=total, page=page, page_size=page_size,
         has_next=(offset + page_size) < total,
     )

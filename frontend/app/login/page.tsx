@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  Sprout, ChevronRight, CheckCircle, Phone, ArrowLeft,
-  Shield, Scan, Bot, TrendingUp, RefreshCw, Clock
+  Sprout, ChevronRight,
+  Shield, Scan, Bot, TrendingUp
 } from 'lucide-react';
 import { authApi } from '@/lib/api';
 
@@ -16,25 +16,14 @@ export default function LoginPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<'email' | 'otp'>('email');
   const [loading, setLoading] = useState(false);
-  const [demoOtp, setDemoOtp] = useState('');
-  const [resendTimer, setResendTimer] = useState(0);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) router.replace('/dashboard');
   }, []);
 
-  // Countdown timer for OTP resend
-  useEffect(() => {
-    if (resendTimer <= 0) return;
-    const timer = setTimeout(() => setResendTimer(t => t - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [resendTimer]);
-
-  const handleSendOtp = async () => {
+  const handleLogin = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast.error('Enter a valid email address');
@@ -42,31 +31,7 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      const response = await authApi.sendOTP(email);
-      
-      if (response.data.otp) {
-        toast.success(`OTP sent to your email address ✓`);
-      } else {
-        toast.success('OTP sent to your email address ✓');
-      }
-      
-      setStep('otp');
-      setResendTimer(60); // 60 second cooldown before resend
-    } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to send OTP. Try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otp.length < 6) {
-      toast.error('Enter the OTP sent to your email');
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await authApi.verifyOTP(email, otp);
+      const response = await authApi.login(email);
       const { access_token, user, is_new_user } = response.data;
 
       // Store auth data
@@ -75,24 +40,14 @@ export default function LoginPage() {
 
       // Route based on is_new_user flag from backend
       if (is_new_user) {
-        toast.success('Welcome to Digital Krishi! Let\'s set up your profile.');
+        toast.success("Welcome to Digital Krishi! Let's set up your profile.");
         setTimeout(() => router.replace('/register'), 300);
       } else {
         toast.success(`Welcome back, ${user.name}! 🌾`);
         setTimeout(() => router.replace('/dashboard'), 300);
       }
     } catch (error: any) {
-      const msg = error.response?.data?.detail;
-      if (msg?.includes('expired')) {
-        toast.error('OTP has expired. Please request a new one.');
-        setStep('email');
-        setOtp('');
-      } else if (msg?.includes('Invalid OTP')) {
-        toast.error('Wrong OTP. Please check and try again.');
-        setOtp('');
-      } else {
-        toast.error(msg || 'Login failed. Please try again.');
-      }
+      toast.error(error.response?.data?.detail || 'Failed to sign in. Try again.');
     } finally {
       setLoading(false);
     }
@@ -165,109 +120,46 @@ export default function LoginPage() {
           <Card className="shadow-2xl border-0 rounded-2xl overflow-hidden">
             {/* Card header */}
             <div className="bg-gradient-to-r from-krishi-green to-emerald-500 px-8 py-6 text-white">
-              <h2 className="text-2xl font-bold">
-                {step === 'email' ? 'Login / Register' : 'Verify OTP'}
-              </h2>
+              <h2 className="text-2xl font-bold">Login / Register</h2>
               <p className="text-sm opacity-80 mt-1">
-                {step === 'email'
-                  ? 'Enter your email address to continue'
-                  : `OTP sent to ${email}`}
+                Enter your email address to continue directly
               </p>
             </div>
 
             <CardContent className="p-8 space-y-6">
-              {step === 'email' ? (
-                <div className="space-y-5">
-                  <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-2 block">Email Address</label>
-                    <div className="relative">
-                      <Input
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="h-14 text-lg font-medium"
-                        onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()}
-                      />
-                    </div>
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={email.length < 5 || loading}
-                    className="w-full h-14 bg-gradient-to-r from-krishi-green to-emerald-500 hover:from-krishi-dark hover:to-emerald-600 shadow-lg shadow-green-200 text-lg font-semibold gap-2"
-                  >
-                    {loading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <>Send OTP <ChevronRight className="w-5 h-5" /></>
-                    )}
-                  </Button>
-
-                  <p className="text-center text-xs text-gray-400">
-                    By continuing, you agree to our Terms of Service and Privacy Policy
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  {/* Real Email notification */}
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-green-800">OTP sent via Email</p>
-                      <p className="text-xs text-green-600 mt-0.5">
-                        Check your inbox at {email}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-2 block">Enter OTP</label>
+              <div className="space-y-5">
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">Email Address</label>
+                  <div className="relative">
                     <Input
-                      placeholder="• • • • • •"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      className="h-14 text-center text-2xl tracking-[0.5em] font-bold"
-                      onKeyDown={(e) => e.key === 'Enter' && handleVerifyOtp()}
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-14 text-lg font-medium"
+                      onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                       autoFocus
                     />
-                    <div className="flex items-center justify-between mt-2">
-                      <p className="text-xs text-gray-400 flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> OTP valid for 5 minutes
-                      </p>
-                      <button
-                        onClick={handleSendOtp}
-                        disabled={resendTimer > 0 || loading}
-                        className="text-xs text-krishi-green hover:text-krishi-dark font-semibold flex items-center gap-1 disabled:text-gray-400 disabled:cursor-not-allowed"
-                      >
-                        <RefreshCw className="w-3 h-3" />
-                        {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
-                      </button>
-                    </div>
                   </div>
-
-                  <Button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={otp.length < 4 || loading}
-                    className="w-full h-14 bg-gradient-to-r from-krishi-green to-emerald-500 hover:from-krishi-dark hover:to-emerald-600 shadow-lg shadow-green-200 text-lg font-semibold gap-2"
-                  >
-                    {loading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <>Verify & Login <CheckCircle className="w-5 h-5" /></>
-                    )}
-                  </Button>
-
-                  <button
-                    onClick={() => { setStep('email'); setDemoOtp(''); setOtp(''); setResendTimer(0); }}
-                    className="flex items-center justify-center gap-1 text-sm text-krishi-green hover:text-krishi-dark font-medium w-full"
-                  >
-                    <ArrowLeft className="w-4 h-4" /> Change email address
-                  </button>
                 </div>
-              )}
+
+                <Button
+                  type="button"
+                  onClick={handleLogin}
+                  disabled={email.length < 5 || loading}
+                  className="w-full h-14 bg-gradient-to-r from-krishi-green to-emerald-500 hover:from-krishi-dark hover:to-emerald-600 shadow-lg shadow-green-200 text-lg font-semibold gap-2"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>Continue <ChevronRight className="w-5 h-5" /></>
+                  )}
+                </Button>
+
+                <p className="text-center text-xs text-gray-400">
+                  Instant sign-in without OTP or password. By continuing, you agree to our Terms of Service.
+                </p>
+              </div>
             </CardContent>
           </Card>
 

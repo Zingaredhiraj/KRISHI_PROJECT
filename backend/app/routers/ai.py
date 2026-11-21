@@ -10,10 +10,11 @@ router = APIRouter(prefix="/api/ai", tags=["AI"])
 
 @router.post("/chat")
 async def ai_chat(req: AIChatRequest, current_user: models.User = Depends(get_current_user)):
+    user_id = current_user.id
     result = await get_ai_response(
         message=req.message,
         language=req.language.value if hasattr(req.language, "value") else req.language,
-        user_id=current_user.id,
+        user_id=user_id,
         image_url=req.image_url
     )
     return result

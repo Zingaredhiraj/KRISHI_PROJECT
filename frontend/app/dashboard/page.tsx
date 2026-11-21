@@ -73,6 +73,8 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [diseaseImage, setDiseaseImage] = useState<string | null>(null);
   const [diseaseResult, setDiseaseResult] = useState<DiseaseDetection | null>(null);
+  const [selectedCropHint, setSelectedCropHint] = useState<string>('');
+  const [isDetectingDisease, setIsDetectingDisease] = useState(false);
   const [postMediaUrl, setPostMediaUrl] = useState<string | null>(null);
   const [postMediaType, setPostMediaType] = useState<'text' | 'image' | 'video'>('text');
   const [isUploading, setIsUploading] = useState(false);
@@ -315,11 +317,14 @@ export default function Dashboard() {
   const handleDiseaseDetect = async () => {
     if (!diseaseImage) return;
 
+    setIsDetectingDisease(true);
     try {
-      const response = await diseaseApi.detect(diseaseImage);
+      const response = await diseaseApi.detect(diseaseImage, selectedCropHint || undefined);
       setDiseaseResult(response.data);
     } catch (error) {
       toast.error('Failed to detect disease');
+    } finally {
+      setIsDetectingDisease(false);
     }
   };
 
@@ -899,10 +904,51 @@ export default function Dashboard() {
                       </div>
 
                       {!diseaseResult && (
-                        <Button onClick={handleDiseaseDetect} size="lg" className="w-full h-16 text-lg font-bold bg-krishi-green hover:bg-krishi-dark shadow-md">
-                          <Scan className="w-6 h-6 mr-3" />
-                          Start AI Analysis
-                        </Button>
+                        <div className="space-y-4">
+                          <div className="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-100">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Crop Type (Optional — select to help AI pinpoint the exact variety):
+                            </label>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {['Auto-Detect (AI)', 'Soybean', 'Cotton', 'Wheat', 'Rice', 'Tomato', 'Corn (Maize)', 'Sugarcane', 'Chili', 'Potato'].map((cropName) => {
+                                const isAuto = cropName.startsWith('Auto-Detect');
+                                const val = isAuto ? '' : cropName.split(' ')[0];
+                                const isSelected = selectedCropHint === val || (isAuto && !selectedCropHint);
+                                return (
+                                  <button
+                                    key={cropName}
+                                    type="button"
+                                    onClick={() => setSelectedCropHint(isAuto ? '' : val)}
+                                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                                      isSelected
+                                        ? 'bg-krishi-green text-white shadow-sm'
+                                        : 'bg-white text-gray-700 hover:bg-emerald-100/50 border border-gray-200'
+                                    }`}
+                                  >
+                                    {cropName}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <input
+                              type="text"
+                              value={selectedCropHint}
+                              onChange={(e) => setSelectedCropHint(e.target.value)}
+                              placeholder="Or type crop name (e.g. Soybean, Mustard, Groundnut)..."
+                              className="w-full px-4 py-2 text-sm bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-krishi-green/40"
+                            />
+                          </div>
+
+                          <Button 
+                            onClick={handleDiseaseDetect} 
+                            disabled={isDetectingDisease}
+                            size="lg" 
+                            className="w-full h-16 text-lg font-bold bg-krishi-green hover:bg-krishi-dark shadow-md"
+                          >
+                            <Scan className={`w-6 h-6 mr-3 ${isDetectingDisease ? 'animate-spin' : ''}`} />
+                            {isDetectingDisease ? 'Analyzing Crop Image...' : 'Start AI Analysis'}
+                          </Button>
+                        </div>
                       )}
 
                       {diseaseResult && (

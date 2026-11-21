@@ -17,12 +17,33 @@ except ImportError:
 try:
     from google import genai
     GEMINI_AVAILABLE = True
-    # Configure API key gracefully (if available in env)
-    api_key = os.getenv("GEMINI_API_KEY", "")
-    gemini_client = genai.Client(api_key=api_key) if api_key else None
 except ImportError:
     GEMINI_AVAILABLE = False
-    gemini_client = None
+
+
+def get_gemini_client():
+    """Dynamically get or create genai.Client using current GEMINI_API_KEY environment variable."""
+    if not GEMINI_AVAILABLE:
+        return None
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        return None
+    try:
+        return genai.Client(api_key=api_key)
+    except Exception as e:
+        print(f"Failed to initialize Gemini client in ML service: {e}")
+        return None
+
+
+GEMINI_MODEL_CANDIDATES = [
+    'gemini-3.5-flash-lite',
+    'gemini-3.7-flash',
+    'gemini-3.8-flash',
+    'gemini-3.6-flash',
+    'gemini-3.5-flash',
+    'gemini-flash-latest'
+]
+
 
 class DiseaseDetectionService:
     def __init__(self):
@@ -105,17 +126,92 @@ class DiseaseDetectionService:
             print(f"Notice: Model not found at {settings.MODEL_PATH} or TF not installed. Will use fallback ML logic.")
             self._is_loaded = False
 
-    def predict(self, image_url_or_path: str) -> dict:
+    def predict(self, image_url_or_path: str, crop_hint: str = None) -> dict:
         """Process image, make prediction, and return info"""
         # Determine actual local path
-        if image_url_or_path.startswith("/uploads/"):
-            filename = image_url_or_path.split("/")[-1]
-            local_path = settings.UPLOAD_DIR / filename
+        if not image_url_or_path:
+            image_url_or_path = ""
+            
+        raw = str(image_url_or_path).split("?")[0]
+        if "/uploads/" in raw:
+            filename = raw.split("/uploads/")[-1]
         else:
-            local_path = image_url_or_path
+            filename = raw.split("/")[-1]
+        filename = os.path.basename(filename)
+        upload_root = settings.UPLOAD_DIR.resolve()
+        candidate = (settings.UPLOAD_DIR / filename).resolve()
+        if not str(candidate).startswith(str(upload_root)) or not filename:
+            local_path = ""
+        else:
+            local_path = candidate
 
-        # If model is loaded, run real prediction!
-        if self._is_loaded and TF_AVAILABLE and os.path.exists(local_path):
+        # 1. Primary: Direct Multimodal Gemini Vision AI Analysis
+        client = get_gemini_client()
+        if client and os.path.isfile(local_path):
+            try:
+                pil_img = Image.open(local_path).convert("RGB")
+                pil_img.thumbnail((1024, 1024))
+                
+                hint_instruction = f"\nFarmer Note: The farmer indicated this crop may be '{crop_hint}'. Please verify whether this matches the visual leaf characteristics (e.g. trifoliate leaves for Soybean) or identify the correct crop.\n" if crop_hint else ""
+
+                vision_prompt = f"""You are an expert plant pathologist and agronomist AI for Indian agriculture.
+Analyze this plant / crop leaf image carefully.{hint_instruction}
+Diagnose:
+1. What crop is this? (e.g. Soybean, Tomato, Rice, Wheat, Potato, Cotton, Corn/Maize, Grape, Apple, Chili, Sugarcane, Onion, Groundnut, etc.)
+2. Is it healthy or does it have a disease/pest issue? What is the specific disease name? (e.g. Early Blight, Late Blight, Yellow Rust, Leaf Spot, Rust, Powdery Mildew, Healthy)
+3. Confidence level as a float between 80.0 and 99.0 (e.g. 94.5)
+4. Comprehensive, actionable treatment plan in Markdown:
+   - Immediate treatment (specific recommended fungicide/pesticide name, dosage per liter or acre, frequency)
+   - Organic / biological treatment options (neem oil spray, Trichoderma, etc.)
+   - Recommended fertilizers to strengthen crop recovery (accurate NPK combinations or micro-nutrients)
+   - Actionable instructions for the farmer
+5. Prevention measures for next harvest or neighboring crops
+
+Return a strict JSON object with EXACTLY these keys:
+{{
+  "crop": "Crop Name",
+  "disease": "Disease Name or Healthy",
+  "confidence": 94.5,
+  "treatment": "Markdown formatted detailed treatment & fertilizer advice",
+  "prevention": "Markdown formatted prevention measures"
+}}
+Respond ONLY with the JSON object.
+"""
+                vision_resp = None
+                for model_candidate in GEMINI_MODEL_CANDIDATES:
+                    try:
+                        vision_resp = client.models.generate_content(
+                            model=model_candidate,
+                            contents=[pil_img, vision_prompt]
+                        )
+                        if vision_resp and vision_resp.text:
+                            print(f"Gemini Vision success using model candidate: {model_candidate}")
+                            break
+                    except Exception as ve:
+                        print(f"Gemini vision attempt with {model_candidate} failed: {ve}")
+
+                if vision_resp and vision_resp.text:
+                    raw_text = vision_resp.text.strip()
+                    if raw_text.startswith("```json"):
+                        raw_text = raw_text[7:]
+                    elif raw_text.startswith("```"):
+                        raw_text = raw_text[3:]
+                    if raw_text.endswith("```"):
+                        raw_text = raw_text[:-3]
+                    v_data = json.loads(raw_text.strip())
+                    print(f"Gemini Vision successfully diagnosed {v_data.get('crop')} - {v_data.get('disease')}")
+                    return {
+                        "disease": v_data.get("disease", "Healthy"),
+                        "confidence": float(v_data.get("confidence", 95.0)),
+                        "crop": v_data.get("crop", crop_hint or "Plant"),
+                        "treatment": v_data.get("treatment", "Ensure standard care and balanced nutrients."),
+                        "prevention": v_data.get("prevention", "Maintain field hygiene.")
+                    }
+            except Exception as e:
+                print(f"Gemini Vision direct diagnosis error: {e}")
+
+        # 2. Secondary: If Keras model is loaded, run local prediction
+        if self._is_loaded and TF_AVAILABLE and os.path.isfile(local_path):
             try:
                 image = Image.open(local_path).convert("RGB")
                 image = image.resize((128, 128)) # Model expects 128x128x3 input
@@ -149,11 +245,9 @@ class DiseaseDetectionService:
                 gemini_success = False
                 base_treatment = ""
                 
-                if GEMINI_AVAILABLE and gemini_client:
-                    import time
-                    for attempt in range(3):  # Retry up to 3 times
+                if client:
+                    for model_cand in GEMINI_MODEL_CANDIDATES:
                         try:
-                            gemini_model_name = 'gemini-2.5-flash'
                             prompt = f"""You are an agricultural expert AI.
 
 Detected Disease: {disease_display}
@@ -173,23 +267,20 @@ Do not include symptoms.
 Do not include prevention measures.
 Only return solution-focused content suitable for direct display under:
 "Recommended Treatment & Fertilizer Solutions"."""
-                            # Add extra fertilizer context if available
                             if recommended:
                                 prompt += f"\n\nAlso consider incorporating these highly recommended fertilizers for {crop_name}: {', '.join(recommended)}"
                                 
-                            response = gemini_client.models.generate_content(
-                                model=gemini_model_name,
+                            response = client.models.generate_content(
+                                model=model_cand,
                                 contents=prompt
                             )
+
                             if response and response.text:
                                 base_treatment = response.text.strip()
                                 gemini_success = True
-                                print(f"Gemini response generated successfully (attempt {attempt + 1})")
                                 break
                         except Exception as ge:
-                            print(f"Gemini API Error (attempt {attempt + 1}): {ge}")
-                            if attempt < 2:
-                                time.sleep(2 * (attempt + 1))  # Exponential backoff
+                            print(f"Gemini API Error with {model_cand}: {ge}")
                 
                 # --- LOCAL FALLBACK (when Gemini fails or is unavailable) ---
                 if not gemini_success:
@@ -249,50 +340,28 @@ Only return solution-focused content suitable for direct display under:
             except Exception as e:
                 print(f"Prediction Error: {e}")
 
-        # --- FALLBACK MOCK (Used if .keras file is not uploaded yet) ---
-        mock_diseases = [
-            ("Early Blight", "Tomato"),
-            ("Leaf Spot", "Rice"),
-            ("Yellow Rust", "Wheat"),
-            ("Healthy", "Corn"),
-            ("Powdery Mildew", "Grape")
-        ]
-        disease, crop = random.choice(mock_diseases)
+        # --- FALLBACK WHEN AI VISION AND LOCAL MODEL ARE BOTH UNAVAILABLE ---
+        crop_display = crop_hint if crop_hint else "Unidentified Plant"
         
-        # Still heavily utilize Gemini to generate a rich response for the fallback crop/disease!
-        treat = "Ensure good air circulation and follow standard care."
-        if GEMINI_AVAILABLE and gemini_client and not disease.lower() == "healthy":
-            try:
-                prompt = f"""You are an agricultural expert AI. The user's crop ({crop}) was detected to have {disease}.
-Generate only practical treatment and fertilizer recommendations.
-Return:
-1. Immediate treatment (fungicide / pesticide name with usage guidance)
-2. Organic treatment options
-3. **Recommended Fertilizers:** (suggest 2 accurate fertilizers combining NPK)
-4. Short actionable farmer instructions
+        # Check if crop_hint matches any known healthy database treatment
+        matched_treatment = None
+        matched_prevention = "Ensure field hygiene and disease-free seeds."
+        if crop_hint:
+            for key, val in self.disease_treatments.items():
+                if val.get("crop", "").lower() == crop_hint.lower() and "healthy" in key.lower():
+                    matched_treatment = val.get("treatment")
+                    matched_prevention = val.get("prevention", matched_prevention)
+                    break
 
-Keep response concise and format beautifully with Markdown.
-Only return solution-focused content suitable for direct display under:
-"Recommended Treatment & Fertilizer Solutions"."""
-                response = gemini_client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=prompt
-                )
-                if response and response.text:
-                    treat = response.text.strip()
-            except Exception as e:
-                print(f"Gemini Fallback Error: {e}")
-                treat = f"## Immediate Treatment\nApply appropriate fungicide for {disease}.\n\n## Organic Options\nUse Neem oil spray.\n\n**Recommended Fertilizers:** NPK 19-19-19, Urea"
-
-        if disease.lower() == "healthy":
-            treat = f"Your {crop} looks perfectly healthy! Keep up the good work.\n\n**Recommended Fertilizers:** Organic Compost, Balanced NPK"
+        if not matched_treatment:
+            matched_treatment = "AI image analysis service is temporarily busy. Please retry in 1 minute or consult your local agricultural extension officer."
 
         return {
-            "disease": disease,
-            "confidence": round(random.uniform(92.0, 99.0), 2),
-            "crop": crop,
-            "treatment": treat,
-            "prevention": "Ensure good air circulation and use resistant varieties."
+            "disease": "Diagnosis Unavailable (AI Limit)",
+            "confidence": 50.0,
+            "crop": crop_display,
+            "treatment": matched_treatment,
+            "prevention": matched_prevention
         }
         
     def predict_best_crop(self, soil_type: str, water_level: str, temperature_history: list, humidity_history: list) -> dict:
@@ -308,7 +377,8 @@ Only return solution-focused content suitable for direct display under:
             "best_practices": "Ensure proper field drainage. Monitor soil moisture daily and apply NPK fertilizers."
         }
 
-        if not (GEMINI_AVAILABLE and gemini_client):
+        client = get_gemini_client()
+        if not client:
             return fallback_response
 
         try:
@@ -326,10 +396,17 @@ Return a strict JSON object with EXACTLY these keys:
 
 Ensure the response is ONLY valid JSON, without any markdown formatting or code blocks.
 """
-            response = gemini_client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=prompt
-            )
+            response = None
+            for model_cand in GEMINI_MODEL_CANDIDATES:
+                try:
+                    response = client.models.generate_content(
+                        model=model_cand,
+                        contents=prompt
+                    )
+                    if response and response.text:
+                        break
+                except Exception as model_err:
+                    print(f"Crop prediction model {model_cand} failed: {model_err}")
             
             if response and response.text:
                 json_str = response.text.replace('```json', '').replace('```', '').strip()

@@ -5,25 +5,41 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 import httpx
 import asyncio
+import logging
 import time as _time
+
+logger = logging.getLogger("digital_krishi.weather")
 
 router = APIRouter(prefix="/api/weather", tags=["Weather"])
 
+# In-memory weather cache: {cache_key: (data, timestamp)}
 _WEATHER_CACHE: dict = {}
-WEATHER_CACHE_TTL = 300
+WEATHER_CACHE_TTL = 300  # 5 minutes
+
+# Geocoding LRU cache: {geo_key: location_name} (never changes for same lat/lon)
+_GEO_CACHE: dict = {}
+MAX_GEO_CACHE = 500
+
 
 def _make_cache_key(lat: float, lon: float) -> str:
     return f"{round(lat, 2)},{round(lon, 2)}"
 
+
 @router.get("/current")
-async def get_weather(lat: float = None, lon: float = None, location: str = None, db: Session = Depends(get_db)):
+async def get_weather(
+    lat: float = None,
+    lon: float = None,
+    location: str = None,
+    db: Session = Depends(get_db)
+):
     if lat is None or lon is None:
         lat, lon = 18.5204, 73.8567
         loc_name = "Pune, Maharashtra (Default)"
         cache_key = "default"
     else:
         cache_key = _make_cache_key(lat, lon)
-        loc_name = None
+        # Check LRU geo cache first
+        loc_name = _GEO_CACHE.get(cache_key)
 
     cached = _WEATHER_CACHE.get(cache_key)
     if cached:
@@ -36,7 +52,7 @@ async def get_weather(lat: float = None, lon: float = None, location: str = None
         if loc_name is None:
             tasks.append(client.get(
                 f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&zoom=10",
-                headers={"User-Agent": "DigitalKrishi/1.0"}
+                headers={"User-Agent": "DigitalKrishi/2.0 (agri-weather-service)"}
             ))
         else:
             tasks.append(asyncio.sleep(0))
@@ -53,12 +69,14 @@ async def get_weather(lat: float = None, lon: float = None, location: str = None
     if loc_name is None:
         nom_result = results[0]
         try:
-            if not isinstance(nom_result, Exception):
+            if not isinstance(nom_result, Exception) and nom_result.status_code == 200:
                 nom_data = nom_result.json()
                 address = nom_data.get("address", {})
                 city = address.get("city") or address.get("town") or address.get("county") or address.get("village", "Unknown Area")
                 state = address.get("state", "")
                 loc_name = f"{city}, {state}".strip(", ")
+                if len(_GEO_CACHE) < MAX_GEO_CACHE:
+                    _GEO_CACHE[cache_key] = loc_name
             else:
                 loc_name = f"GPS ({round(lat, 2)}, {round(lon, 2)})"
         except Exception:
@@ -99,26 +117,47 @@ async def get_weather(lat: float = None, lon: float = None, location: str = None
             day_name = (datetime.now() + timedelta(days=i)).strftime("%A")
             if i == 1:
                 day_name = "Tomorrow"
-            forecast.append({"day": day_name, "temp": float(daily["temperature_2m_max"][i]), "condition": f_cond})
+            forecast.append({
+                "day": day_name,
+                "temp": float(daily["temperature_2m_max"][i]),
+                "condition": f_cond
+            })
 
         data = {
-            "id": 1, "location": loc_name, "temperature": float(temp), "condition": condition,
-            "humidity": humidity, "wind_speed": float(wind_speed), "forecast": forecast,
+            "id": 1,
+            "location": loc_name,
+            "temperature": float(temp),
+            "condition": condition,
+            "humidity": humidity,
+            "wind_speed": float(wind_speed),
+            "forecast": forecast,
             "recorded_at": datetime.now().isoformat(),
-            "water_level_suggestion": "Delay irrigation, rain expected." if "Rain" in condition else "Normal irrigation recommended.",
-            "fertilizer_suggestion": "Avoid foliar spray due to incoming rain/wind." if ("Rain" in condition or wind_speed > 20) else "Good weather for foliar spray.",
+            "water_level_suggestion": (
+                "Delay irrigation, rain expected." if "Rain" in condition
+                else "Normal irrigation recommended."
+            ),
+            "fertilizer_suggestion": (
+                "Avoid foliar spray due to incoming rain/wind." if ("Rain" in condition or wind_speed > 20)
+                else "Good weather for foliar spray."
+            ),
         }
 
         _WEATHER_CACHE[cache_key] = (data, _time.time())
         return data
 
     except Exception as e:
-        print(f"Weather API Error: {e}")
+        logger.warning(f"Weather API Error: {e}")
         if cached:
             return cached[0]
         return {
-            "id": 1, "location": loc_name, "temperature": 28.5, "condition": "Cloudy", "humidity": 45, "wind_speed": 12.5,
+            "id": 1,
+            "location": loc_name or "Pune, Maharashtra",
+            "temperature": 28.5,
+            "condition": "Cloudy",
+            "humidity": 45,
+            "wind_speed": 12.5,
             "forecast": [{"day": "Tomorrow", "temp": 29, "condition": "Sunny"}],
             "recorded_at": datetime.now().isoformat(),
-            "water_level_suggestion": "Normal irrigation recommended", "fertilizer_suggestion": "Monitor local conditions"
+            "water_level_suggestion": "Normal irrigation recommended",
+            "fertilizer_suggestion": "Monitor local conditions"
         }

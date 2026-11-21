@@ -10,9 +10,12 @@ from datetime import datetime
 router = APIRouter(prefix="/api", tags=["Machine Learning"])
 
 @router.post("/disease/detect")
-def detect_disease(req: DiseaseDetectionCreate):
+def detect_disease(
+    req: DiseaseDetectionCreate,
+    current_user: models.User = Depends(get_current_user),
+):
     try:
-        result = ml_service.predict(req.image_url)
+        result = ml_service.predict(req.image_url, crop_hint=req.crop_hint)
         return {
             "id": 1,
             "image_url": req.image_url,
@@ -28,11 +31,11 @@ def detect_disease(req: DiseaseDetectionCreate):
         return {
             "id": 1,
             "image_url": req.image_url,
-            "detected_disease": "Leaf Blight (Fallback)",
-            "confidence": 85.0,
-            "crop_type": "Tomato",
-            "treatment": "Ensure proper drainage.",
-            "prevention": "Rotate crops.",
+            "detected_disease": "Detection Temporarily Unavailable",
+            "confidence": 40.0,
+            "crop_type": req.crop_hint or "Unidentified Crop",
+            "treatment": "Unable to complete visual analysis at this time. Please retry in a moment.",
+            "prevention": "Ensure good drainage and hygiene.",
             "created_at": datetime.now().isoformat()
         }
 

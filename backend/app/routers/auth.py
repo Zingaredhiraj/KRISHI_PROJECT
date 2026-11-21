@@ -1,5 +1,6 @@
 import os
-import httpx
+import logging
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -8,17 +9,23 @@ from app.database import get_db
 from app.auth import create_access_token, get_current_user
 from app.schemas import UserUpdate, UserResponse
 
+logger = logging.getLogger("digital_krishi.auth")
+
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+
+class EmailLoginRequest(BaseModel):
+    email: str
+
 
 class OTPRequest(BaseModel):
     email: str
 
+
 class OTPVerify(BaseModel):
     email: str
-    otp: str
+    otp: Optional[str] = None
+
 
 def normalize_phone(phone: str) -> str:
     """Normalize phone to +91XXXXXXXXXX format."""
@@ -30,42 +37,13 @@ def normalize_phone(phone: str) -> str:
             phone = '+' + phone
     return phone
 
-@router.post("/otp/send")
-async def send_otp(req: OTPRequest, db: Session = Depends(get_db)):
-    if not SUPABASE_URL or not SUPABASE_ANON_KEY:
-        raise HTTPException(status_code=500, detail="Supabase keys missing. Add SUPABASE_URL and SUPABASE_ANON_KEY to backend .env")
-    email = req.email.strip().lower()
-    url = f"{SUPABASE_URL}/auth/v1/otp"
-    headers = {"apikey": SUPABASE_ANON_KEY, "Content-Type": "application/json"}
-    payload = {"email": email, "create_user": True}
-    
-    async with httpx.AsyncClient() as client:
-        res = await client.post(url, headers=headers, json=payload)
-        
-    if res.status_code == 429:
-        raise HTTPException(status_code=429, detail="Too many emails sent. Please try again later.")
-    if res.status_code >= 400:
-        err_msg = res.json().get("msg", "Failed to send OTP")
-        raise HTTPException(status_code=400, detail=err_msg)
-    return {"message": "OTP sent successfully via email", "email": email}
 
-@router.post("/otp/verify")
-async def verify_otp(req: OTPVerify, db: Session = Depends(get_db)):
-    if not SUPABASE_URL or not SUPABASE_ANON_KEY:
-        raise HTTPException(status_code=500, detail="Supabase keys missing.")
-    email = req.email.strip().lower()
-    otp_code = req.otp.strip()
-    url = f"{SUPABASE_URL}/auth/v1/verify"
-    headers = {"apikey": SUPABASE_ANON_KEY, "Content-Type": "application/json"}
-    payload = {"type": "email", "email": email, "token": otp_code}
-    
-    async with httpx.AsyncClient() as client:
-        res = await client.post(url, headers=headers, json=payload)
-        
-    if res.status_code >= 400:
-        err_msg = res.json().get("msg", "Invalid or expired OTP")
-        raise HTTPException(status_code=400, detail=err_msg)
-    
+def authenticate_email_user(email_raw: str, db: Session):
+    """Directly authenticates or registers a user with just their email."""
+    email = email_raw.strip().lower()
+    if not email or "@" not in email:
+        raise HTTPException(status_code=400, detail="Invalid email address.")
+
     user = db.query(models.User).filter(models.User.email == email).first()
     is_new_user = False
     if not user:
@@ -81,27 +59,59 @@ async def verify_otp(req: OTPVerify, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(user)
         is_new_user = True
-        
+
     token = create_access_token(data={"sub": str(user.id)})
     return {
         "access_token": token,
         "token_type": "bearer",
         "is_new_user": is_new_user,
         "user": {
-            "id": user.id, "name": user.name, "email": user.email,
-            "phone": user.phone, "language": user.language, "location": user.location,
-            "crop_preferences": user.crop_preferences, "avatar_url": user.avatar_url,
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "phone": user.phone,
+            "language": user.language,
+            "location": user.location,
+            "crop_preferences": user.crop_preferences,
+            "avatar_url": user.avatar_url,
         }
     }
+
+
+@router.post("/login")
+async def email_login(req: EmailLoginRequest, db: Session = Depends(get_db)):
+    """Direct email login without OTP or password."""
+    return authenticate_email_user(req.email, db)
+
+
+@router.post("/otp/send")
+async def send_otp(req: OTPRequest, db: Session = Depends(get_db)):
+    """OTP bypass - direct email login enabled."""
+    return {
+        "message": "OTP verification is disabled. You can log in directly with your email.",
+        "email": req.email.strip().lower(),
+    }
+
+
+@router.post("/otp/verify")
+async def verify_otp(req: OTPVerify, db: Session = Depends(get_db)):
+    """Direct email login without OTP verification."""
+    return authenticate_email_user(req.email, db)
+
 
 @router.get("/me")
 def get_me(current_user: models.User = Depends(get_current_user)):
     return {
-        "id": current_user.id, "name": current_user.name, "email": current_user.email,
-        "phone": current_user.phone, "location": current_user.location,
-        "language": current_user.language, "crop_preferences": current_user.crop_preferences,
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "phone": current_user.phone,
+        "location": current_user.location,
+        "language": current_user.language,
+        "crop_preferences": current_user.crop_preferences,
         "avatar_url": current_user.avatar_url,
     }
+
 
 @router.put("/profile", response_model=UserResponse)
 def update_profile(

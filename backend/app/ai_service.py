@@ -9,11 +9,22 @@ load_dotenv()
 try:
     from google import genai
     GEMINI_AVAILABLE = True
-    api_key = os.getenv("GEMINI_API_KEY", "")
-    gemini_client = genai.Client(api_key=api_key) if api_key else None
 except ImportError:
     GEMINI_AVAILABLE = False
-    gemini_client = None
+
+
+def get_gemini_client():
+    """Dynamically get or create genai.Client using current GEMINI_API_KEY environment variable."""
+    if not GEMINI_AVAILABLE:
+        return None
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        return None
+    try:
+        return genai.Client(api_key=api_key)
+    except Exception as e:
+        logger.error(f"Failed to initialize Gemini client: {e}")
+        return None
 
 # Language display names for prompting
 LANGUAGE_NAMES = {
@@ -80,6 +91,15 @@ SUGGESTIONS = {
 }
 
 
+import logging
+
+logger = logging.getLogger("digital_krishi.ai")
+
+# In-memory query cache for fast responses: { (msg_lower, lang): (response_dict, timestamp) }
+_AI_CACHE: dict = {}
+_AI_CACHE_TTL = 3600  # 1 hour
+
+
 async def get_ai_response(
     message: str,
     language: str = "en",
@@ -88,7 +108,7 @@ async def get_ai_response(
     image_url: str = None
 ) -> Dict[str, any]:
     """
-    Get AI response using Gemini (primary) with local fallback.
+    Get AI response using Gemini (primary) with fast-path memory caching and local fallback.
     """
     if chat_history is None:
         chat_history = []
@@ -96,8 +116,19 @@ async def get_ai_response(
     language = language if language in LANGUAGE_NAMES else "en"
     lang_name = LANGUAGE_NAMES[language]
 
+    # Fast-path cache lookup for text-only queries
+    cache_key = (message.strip().lower(), language)
+    if not image_url and not chat_history:
+        cached = _AI_CACHE.get(cache_key)
+        if cached:
+            data, ts = cached
+            import time
+            if time.time() - ts < _AI_CACHE_TTL:
+                return data
+
     # ===== GEMINI AI =====
-    if GEMINI_AVAILABLE and gemini_client:
+    client = get_gemini_client()
+    if client:
         try:
             system_instructions = f"""You are Digital Krishi, an expert AI assistant for Indian farmers.
 Always respond in {lang_name} language.
@@ -108,60 +139,58 @@ If asked in Hindi/Tamil/Telugu/Marathi, respond fully in that language.
             # Build conversation history for context
             contents = []
 
-            # Add chat history for context (last 6 messages)
             for hist in chat_history[-6:]:
                 role = hist.get("role", "user")
                 content = hist.get("content", "")
                 if role in ("user", "model") and content:
                     contents.append({"role": role, "parts": [{"text": content}]})
 
-            # Build current user parts
             current_user_parts = [{"text": system_instructions + "\n\nUser: " + message}]
 
-            # Add image if provided
             if image_url:
                 try:
                     from PIL import Image
                     filename = os.path.basename(image_url)
-                    local_path = os.path.join(os.getcwd(), "static", "uploads", filename)
+                    local_path = os.path.join(os.getcwd(), "uploads", filename)
                     if os.path.exists(local_path):
                         img = Image.open(local_path)
                         current_user_parts.append(img)
                 except Exception as e:
-                    print(f"Error loading image for chat: {e}")
+                    logger.warning(f"Error loading image for chat: {e}")
 
             contents.append({
                 "role": "user",
                 "parts": current_user_parts
             })
 
-            try:
-                response = gemini_client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=contents
-                )
-            except Exception as e:
-                # Fallback to flash-latest if 2.5 has exhausted free-tier quotas or hangs
-                print(f"2.5-flash failed, falling back to flash-latest. Error: {e}")
-                response = gemini_client.models.generate_content(
-                    model='gemini-flash-latest',
-                    contents=[{"role": "user", "parts": current_user_parts}]
-                )
+            response = None
+            for model_cand in ['gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest']:
+                try:
+                    response = client.models.generate_content(
+                        model=model_cand,
+                        contents=contents
+                    )
+                    if response and response.text:
+                        break
+                except Exception as e:
+                    logger.info(f"Gemini chat model {model_cand} attempt failed: {e}")
+
+            if not response or not response.text:
+                return _get_local_response(message, language)
 
             if response and response.text:
                 ai_text = response.text.strip()
                 suggestions = SUGGESTIONS.get(language, SUGGESTIONS["en"])
-                print(f"Gemini AI response generated for language: {language}")
-                return {
+                res = {
                     "response": ai_text,
                     "suggestions": suggestions[:5]
                 }
+                import time
+                _AI_CACHE[cache_key] = (res, time.time())
+                return res
 
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            print(f"Gemini AI Chat Error: {e}")
-            # Fall through to local fallback
+            logger.warning(f"Gemini AI Chat Error: {e}")
 
     # ===== LOCAL FALLBACK =====
     return _get_local_response(message, language)
@@ -245,7 +274,8 @@ def get_weather_agricultural_advice(current_weather: dict, forecast_summary: str
             "fertilizer_timing": fertilizer
         }
 
-    if not (GEMINI_AVAILABLE and gemini_client):
+    client = get_gemini_client()
+    if not client:
         return get_heuristic_advice(current_weather)
 
     try:
@@ -259,12 +289,19 @@ Format: <water_level_advice> | <fertilizer_timing_advice>
 
         user_prompt = f"Current Weather: Temp: {current_weather.get('temp')}C, Humidity: {current_weather.get('humidity')}%, Wind: {current_weather.get('wind_speed')} km/h, Condition: {current_weather.get('condition')}\nForecast/History: {forecast_summary}"
 
-        response = gemini_client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=[
-                {"role": "user", "parts": [{"text": system_prompt + "\n\n" + user_prompt}]}
-            ]
-        )
+        response = None
+        for model_cand in ['gemini-3.5-flash-lite', 'gemini-3.7-flash', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash']:
+            try:
+                response = client.models.generate_content(
+                    model=model_cand,
+                    contents=[
+                        {"role": "user", "parts": [{"text": system_prompt + "\n\n" + user_prompt}]}
+                    ]
+                )
+                if response and response.text:
+                    break
+            except Exception as e:
+                logger.info(f"Weather advice model {model_cand} failed: {e}")
 
         if response and response.text:
             parts = response.text.strip().split('|')

@@ -47,18 +47,23 @@ class UserResponse(UserBase):
     profile_photo: Optional[str] = None
     crop_preferences: Optional[List[str]] = None
     is_active: bool
-    created_at: datetime
+    created_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
 
 # Auth Schemas
+class EmailLoginRequest(BaseModel):
+    email: str
+
 class OTPRequest(BaseModel):
-    phone: str = Field(..., min_length=10, max_length=15)
+    phone: Optional[str] = None
+    email: Optional[str] = None
 
 class OTPVerify(BaseModel):
-    phone: str
-    otp: str = Field(..., min_length=4, max_length=6)
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    otp: Optional[str] = None
 
 class Token(BaseModel):
     access_token: str
@@ -137,6 +142,7 @@ class AIChatResponse(BaseModel):
 # Disease Detection Schemas
 class DiseaseDetectionCreate(BaseModel):
     image_url: str
+    crop_hint: Optional[str] = None
 
 class DiseaseDetectionResponse(BaseModel):
     id: int
