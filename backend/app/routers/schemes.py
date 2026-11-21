@@ -19,6 +19,14 @@ def get_schemes(
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db)
 ):
+    # Auto-seed if empty
+    if db.query(models.GovernmentScheme.id).first() is None:
+        from app.services.scheme_service import seed_default_schemes
+        try:
+            seed_default_schemes(db)
+        except Exception:
+            pass
+
     query = db.query(models.GovernmentScheme).filter(models.GovernmentScheme.is_active == True)
 
     if search:

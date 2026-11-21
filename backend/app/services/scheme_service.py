@@ -78,6 +78,77 @@ def seed_default_schemes(db: Session):
             "application_link": None,
             "start_date": date(2023, 4, 1),
             "end_date": date(2023, 10, 31)
+        },
+        {
+            "title": "PM-KUSUM (Solar Agricultural Pump Scheme)",
+            "description": "Up to 90% subsidy for installation of standalone solar agriculture pumps and solarisation of existing grid-connected agricultural pumps.",
+            "category": "Central",
+            "status": "Current",
+            "eligibility": "Individual farmers, groups of farmers, cooperatives, and water user associations.",
+            "min_age": 18,
+            "max_income": 1000000,
+            "min_land_acres": 0.5,
+            "eligible_categories": "General, OBC, SC, ST",
+            "application_link": "https://pmkusum.mnre.gov.in/",
+            "start_date": date(2019, 3, 8),
+            "end_date": None
+        },
+        {
+            "title": "Kisan Credit Card (KCC) Scheme",
+            "description": "Concessional institutional credit at effective interest rate of 4% per annum for crop loans up to Rs. 3 Lakhs.",
+            "category": "Central",
+            "status": "Current",
+            "eligibility": "All farmers, individuals, joint borrowers, tenant farmers, and self-help groups.",
+            "min_age": 18,
+            "max_income": 1500000,
+            "min_land_acres": 0,
+            "eligible_categories": "General, OBC, SC, ST",
+            "application_link": "https://www.myscheme.gov.in/schemes/kcc",
+            "start_date": date(1998, 8, 1),
+            "end_date": None
+        },
+        {
+            "title": "Soil Health Card Scheme",
+            "description": "Provides soil health cards to farmers with crop-wise nutrient and fertilizer dosage recommendations.",
+            "category": "Central",
+            "status": "Current",
+            "eligibility": "All landholding farmers across India.",
+            "min_age": 18,
+            "max_income": 1000000,
+            "min_land_acres": 0,
+            "eligible_categories": "General, OBC, SC, ST",
+            "application_link": "https://www.soilhealth.dac.gov.in/",
+            "start_date": date(2015, 2, 19),
+            "end_date": None
+        },
+        {
+            "title": "Agricultural Mechanization Subsidy (SMAM / MahaDBT)",
+            "description": "40% to 50% subsidy on purchase of tractors, rotavators, power tillers, and modern farm equipment.",
+            "category": "State",
+            "state_name": "Maharashtra",
+            "status": "Current",
+            "eligibility": "Farmers of Maharashtra registered on MahaDBT portal with 7/12 land extract.",
+            "min_age": 18,
+            "max_income": 500000,
+            "min_land_acres": 0.5,
+            "eligible_categories": "General, OBC, SC, ST",
+            "application_link": "https://mahadbt.maharashtra.gov.in/",
+            "start_date": date(2020, 1, 1),
+            "end_date": None
+        },
+        {
+            "title": "Paramparagat Krishi Vikas Yojana (PKVY)",
+            "description": "Rs. 50,000 per hectare financial assistance for organic farming, bio-fertilizers, and organic certification.",
+            "category": "Central",
+            "status": "Current",
+            "eligibility": "Farmers practicing or willing to adopt organic farming in clusters.",
+            "min_age": 18,
+            "max_income": 500000,
+            "min_land_acres": 1.0,
+            "eligible_categories": "General, OBC, SC, ST",
+            "application_link": "https://pgsindia-ncof.gov.in/",
+            "start_date": date(2015, 4, 1),
+            "end_date": None
         }
     ]
 

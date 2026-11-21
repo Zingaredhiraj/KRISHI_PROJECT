@@ -24,6 +24,17 @@ def get_market_prices(
     """
     Get all-India market prices with filters, sorting, and pagination.
     """
+    # Auto-ensure today's market prices exist
+    from datetime import datetime, timezone
+    today = datetime.now(timezone.utc).date()
+    has_today = db.query(models.MarketPrice.id).filter(models.MarketPrice.date == today).first()
+    if not has_today:
+        from app.services.scrapers import _insert_mock_market_prices
+        try:
+            _insert_mock_market_prices(db)
+        except Exception:
+            pass
+
     query = db.query(models.MarketPrice)
     
     if state and state.lower() != "all":
