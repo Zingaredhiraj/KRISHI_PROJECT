@@ -117,6 +117,7 @@ app.include_router(misc.router)
 
 # ── Health & Root ──────────────────────────────────────────────
 @app.get("/health")
+@app.get("/healthz")
 def health_check():
     return {"status": "ok", "message": "Digital Krishi API is running smoothly"}
 
