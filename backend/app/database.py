@@ -16,9 +16,11 @@ if not DATABASE_URL:
     DATABASE_URL = "sqlite:///krishi.db"
     logger.info("DATABASE_URL not set — falling back to local SQLite: %s", DATABASE_URL)
 
-# SQLAlchemy 1.4+ requires "postgresql://" instead of "postgres://"
+# SQLAlchemy 2+ requires explicit driver; ensure psycopg2 is used for PostgreSQL
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+elif DATABASE_URL.startswith("postgresql://") and not DATABASE_URL.startswith("postgresql+"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 if DATABASE_URL.startswith("sqlite"):
     # SQLite does not support QueuePool arguments (pool_size, max_overflow, sslmode)
