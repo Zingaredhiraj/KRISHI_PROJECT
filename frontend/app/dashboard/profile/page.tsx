@@ -64,6 +64,7 @@ export default function ProfilePage() {
     const [dashboard, setDashboard] = useState<ProfileDashboard | null>(null);
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [avatarError, setAvatarError] = useState(false);
 
     // Edit form
     const [editName, setEditName] = useState('');
@@ -256,8 +257,13 @@ export default function ProfilePage() {
                             {/* Avatar */}
                             <div className="relative group">
                                 <div className="w-32 h-32 rounded-2xl border-4 border-white shadow-xl bg-gradient-to-br from-krishi-green to-emerald-400 flex items-center justify-center overflow-hidden">
-                                    {avatarSrc ? (
-                                        <img src={avatarSrc} alt="Profile" className="w-full h-full object-cover" />
+                                    {avatarSrc && !avatarError ? (
+                                        <img
+                                            src={avatarSrc}
+                                            alt="Profile"
+                                            className="w-full h-full object-cover"
+                                            onError={() => setAvatarError(true)}
+                                        />
                                     ) : (
                                         <span className="text-5xl font-bold text-white">{user?.name?.[0]?.toUpperCase() || 'F'}</span>
                                     )}

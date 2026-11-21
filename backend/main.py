@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, FileResponse, Response
 
 from app.database import engine
 from app.security import apply_response_headers, check_rate_limit, validate_runtime_config
@@ -97,9 +97,21 @@ async def protect_and_cache(request: Request, call_next):
     return apply_response_headers(request, response)
 
 
-# ── Static Uploads Mount ───────────────────────────────────────
+# ── Static Uploads with Graceful Fallback ────────────────────────
 os.makedirs("uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+DEFAULT_AVATAR_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+<rect width="100" height="100" fill="#10b981" rx="20"/>
+<circle cx="50" cy="38" r="18" fill="#ffffff"/>
+<path d="M22 82 C22 62 36 56 50 56 C64 56 78 62 78 82 Z" fill="#ffffff"/>
+</svg>"""
+
+@app.get("/uploads/{filename:path}")
+def serve_upload(filename: str):
+    file_path = os.path.join("uploads", filename)
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    return Response(content=DEFAULT_AVATAR_SVG, media_type="image/svg+xml")
 
 # ── Include Modular Routers ────────────────────────────────────
 app.include_router(auth.router)
